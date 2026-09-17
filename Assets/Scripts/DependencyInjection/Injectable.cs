@@ -6,9 +6,9 @@ public class Injectable<T, I>: MonoBehaviour
 {
     private IContainerService Container => ContainerService.Instance;
 
-    void Start()
+    public Injectable()
     {
         this.Container.Register<T, I>(this as T);
     }
-    
+
 }
