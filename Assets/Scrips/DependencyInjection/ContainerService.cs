@@ -14,9 +14,19 @@ public class ContainerService : Singleton<ContainerService>, IContainerService
         where T : MonoBehaviour 
         where I : class
     {
+        if (_instances.ContainsKey(typeof(I)))
+        {
+            Debug.LogWarning($"Type {typeof(I)} is already registered.");
+            return;
+        }
+        
         _instances.Add(typeof(I), instance);
     }
 
+    public T Resolve<T>() where T : class
+    {
+        return _instances[typeof(T)] as T;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
