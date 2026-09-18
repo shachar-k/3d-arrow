@@ -42,6 +42,10 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
             this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, targetRotation, _turnRate));
             this.Rigidbody.MovePosition(newpos);
         }
+        else
+        {
+            this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, this._defualtRotation, _turnRate));
+        }
 
     }
 }
