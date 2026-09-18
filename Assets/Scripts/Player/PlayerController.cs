@@ -5,6 +5,10 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
     #region DataMembers
     [SerializeField]
     private float _movespeed = 0.3f;
+    [SerializeField]
+    private int _turnAngle = 30;
+    [SerializeField]
+    private float _turnRate = 0.25f;
 
     #endregion
 
@@ -32,7 +36,10 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         {
             Debug.Log("here");
             Vector3 newpos = this.transform.position + Vector3.left *direction * _movespeed;
+            Quaternion targetRotation = Quaternion.Euler(new Vector3( -90 + _turnAngle * direction,-90, 0));
             
+            this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, targetRotation, _turnRate));
+
             this.Rigidbody.MovePosition(newpos);
         }
 
