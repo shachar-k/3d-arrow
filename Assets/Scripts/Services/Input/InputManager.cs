@@ -4,13 +4,36 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InputManager : Singleton<InputManager>, IInputManager
+public class InputManager : Singleton<InputManager>, IInputManager, IInitializble
 {
     #region DataMembers
     private Dictionary<eInput, InputTypeValue> _inputValues = new Dictionary<eInput, InputTypeValue>();
     private Dictionary<eInputMap, InputActionMap> _inputMaps = new Dictionary<eInputMap, InputActionMap>();
+    private InputActionAsset _inputAsset;
 
     #endregion
+
+    #region Methods
+
+    public void Initialize()
+    {
+        if (this._inputAsset == null)
+        {
+            this._inputAsset = InputSystem.actions;
+
+            if (this._inputAsset == null)
+            {
+                throw new Exception("No InputActionAsset is configured for the project. Assign the default Input Actions asset or add a PlayerInput component with actions.");
+            }
+        }
+
+        if (!this._inputMaps.ContainsKey(eInputMap.Player))
+        {
+            this._inputMaps[eInputMap.Player] = this._inputAsset.FindActionMap(Consts.PlayerInputMap, throwIfNotFound: true);
+        }
+
+        this.GetReferences();
+    }
 
     public T GetInputValue<T>(eInput inputType)
     {
@@ -26,43 +49,30 @@ public class InputManager : Singleton<InputManager>, IInputManager
         }
     }
 
-
-    public void enableMap(eInputMap inputMap)
+    public void EnableMap(eInputMap inputMap)
     {
-        _inputMaps[inputMap].Enable();
+        this._inputMaps[inputMap].Enable();
     }
 
-    public void disableMap(eInputMap inputMap)
+    public void DisableMap(eInputMap inputMap)
     {
-        _inputMaps[inputMap].Disable();
-    }
-
-    void Start()
-    {
-        _inputMaps[eInputMap.Player] = InputSystem.actions.FindActionMap(Consts.PlayerInputMap, throwIfNotFound: true);
+        this._inputMaps[inputMap].Disable();
     }
 
     private void Awake()
     {
-        GetReferences();
-
+        this.Initialize();
     }
 
-    private void GetReferences()
-    {
-        // Project-wide actions, which the Input System enables on entering play mode.
-        var player = _inputMaps[eInputMap.Player];
 
-        this._inputValues[eInput.playerMoveInput] = new InputTypeValue<float>()
-        {
-            Action = player.FindAction(Consts.MoveAction, throwIfNotFound: true)
-        };
+    void Start()
+    {
     }
 
     // Update is called once per frame
     void Update()
     {
-        var floatValueInput = _inputValues.Where(x => x.Value.Type == typeof(float)).ToList();
+        var floatValueInput = this._inputValues.Where(x => x.Value.Type == typeof(float)).ToList();
 
         foreach (var input in floatValueInput)
         {
@@ -72,4 +82,17 @@ public class InputManager : Singleton<InputManager>, IInputManager
     }
 
 
+
+    private void GetReferences()
+    {
+        // Project-wide actions, which the Input System enables on entering play mode.
+        var player = this._inputMaps[eInputMap.Player];
+
+        this._inputValues[eInput.playerMoveInput] = new InputTypeValue<float>()
+        {
+            Action = player.FindAction(Consts.MoveAction, throwIfNotFound: true)
+        };
+    }
+
+    #endregion
 }

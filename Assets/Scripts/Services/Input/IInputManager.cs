@@ -2,7 +2,7 @@ public interface IInputManager
 {
     #region Methods
         public T GetInputValue<T>(eInput inputType);
-        public void enableMap(eInputMap inputMap);
-        public void disableMap(eInputMap inputMap);
+        public void EnableMap(eInputMap inputMap);
+        public void DisableMap(eInputMap inputMap);
     #endregion
 }

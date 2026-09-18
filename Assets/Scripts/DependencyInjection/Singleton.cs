@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class Singleton<T> : MonoBehaviour where T: MonoBehaviour
+public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T _instance;
 
@@ -11,29 +11,40 @@ public abstract class Singleton<T> : MonoBehaviour where T: MonoBehaviour
     /// </summary>
     public static bool HasInstance => _instance != null;
 
-    public static T Instance
+    public static T Instance { get; private set; }
+
+    void Start()
     {
-        get
+        if (_instance != null && _instance != this)
         {
-            return SetInstance();
+            Destroy(this.gameObject);
+            return;
         }
+
+        CreateInstance();
     }
 
-    private static T SetInstance()
+    public static T CreateInstance(GameObject parent = null)
     {
         if (_instance != null)
         {
             return _instance;
         }
 
-        _instance = FindAnyObjectByType<T>();
+        _instance = parent != null ? parent.GetComponent<T>() : FindAnyObjectByType<T>();
 
         if (_instance == null)
         {
-            var singletonObject = new GameObject(typeof(T).Name);
-            _instance = singletonObject.AddComponent<T>();
+            if (parent == null)
+            {
+                parent = FindAnyObjectByType<MonoBehaviour>().gameObject;
+            }
+
+            _instance = parent.AddComponent<T>();
         }
 
+        (_instance as IInitializble)?.Initialize();
+        
         return _instance;
     }
 

@@ -4,10 +4,11 @@ public class Injectable<T, I>: MonoBehaviour
     where T : MonoBehaviour 
     where I : class
 {
-    private IContainerService Container => ContainerService.Instance;
+    protected IContainerService Container  {get; private set; }
 
-    public Injectable()
+    protected virtual void Start()
     {
+        this.Container = ContainerService.Instance ?? ContainerService.CreateInstance();
         this.Container.Register<T, I>(this as T);
     }
 
