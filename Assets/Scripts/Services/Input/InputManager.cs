@@ -66,13 +66,13 @@ public class InputManager : Singleton<InputManager>, IInputManager, IInitializbl
 
         foreach (var input in floatValueInput)
         {
-            (input.Value as InputTypeValue<float>).Value = GetNumberValue(input.Value);
+            (input.Value as InputTypeValue<float>).Value = GetNumberValue<float>(input.Value);
         }
     }
 
-    private static float GetNumberValue(InputTypeValue input)
+    private static T GetNumberValue<T>(InputTypeValue input) where T : struct
     {
-        return input.Action.ReadValue<float>();
+        return input.Action.ReadValue<T>();
     }
 
     private void GetReferences()

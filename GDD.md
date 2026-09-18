@@ -81,6 +81,7 @@ stateDiagram-v2
 | `rampFixedMinutes` | How many minutes elapse between each speed jump | 1 min |
 | `rampSpeed` | How much forward speed is added at each jump — trades against `rampFixedMinutes`; fewer, bigger jumps feel very different from many small ones | +2 u/s |
 | `turnRate` | How fast heading rotates per second while a turn is held | 90 °/s |
+| `turnSpeed` | How fast heading moves per second while a turn is held | 0.3 °/s |
 | `turnAngle` | The maximum heading offset from forward the player can turn to — caps how sharp a dodge can be, so a shape directly behind a bad turn can become unavoidable on purpose | 60° |
 | `spawnInterval` | Time between obstacle spawns — the second difficulty dial alongside speed | 0.6 s |
 | `maxDistanceForward` | Far edge of the spawn plane ahead of the player — together with `scrollSpeed` this sets how much warning the player gets | 30 u |
