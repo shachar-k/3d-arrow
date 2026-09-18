@@ -9,6 +9,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
     private int _turnAngle = 30;
     [SerializeField]
     private float _turnRate = 0.25f;
+    private Quaternion _defualtRotation;
 
     #endregion
 
@@ -26,6 +27,8 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         base.Start();
         this.InputManager = this.Container.Resolve<IInputManager>();
         this.Rigidbody = this.GetComponent<Rigidbody>();
+        this._defualtRotation = this.transform.rotation;
+        this.MainCamera = Camera.main;
     }
 
     void FixedUpdate()
@@ -34,12 +37,9 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
         if(direction != 0)
         {
-            Debug.Log("here");
             Vector3 newpos = this.transform.position + Vector3.left *direction * _movespeed;
-            Quaternion targetRotation = Quaternion.Euler(new Vector3( -90 + _turnAngle * direction,-90, 0));
-            
+            Quaternion targetRotation = Quaternion.Euler(this._defualtRotation.eulerAngles + new Vector3( _turnAngle * direction, 0, 0));    
             this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, targetRotation, _turnRate));
-
             this.Rigidbody.MovePosition(newpos);
         }
 
