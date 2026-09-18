@@ -59,16 +59,6 @@ public class InputManager : Singleton<InputManager>, IInputManager, IInitializbl
         this._inputMaps[inputMap].Disable();
     }
 
-    private void Awake()
-    {
-        this.Initialize();
-    }
-
-
-    void Start()
-    {
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -76,12 +66,14 @@ public class InputManager : Singleton<InputManager>, IInputManager, IInitializbl
 
         foreach (var input in floatValueInput)
         {
-            InputTypeValue<float> value = input.Value as InputTypeValue<float>;
-            value.Value = input.Value.Action.ReadValue<float>();
+            (input.Value as InputTypeValue<float>).Value = GetNumberValue(input.Value);
         }
     }
 
-
+    private static float GetNumberValue(InputTypeValue input)
+    {
+        return input.Action.ReadValue<float>();
+    }
 
     private void GetReferences()
     {
