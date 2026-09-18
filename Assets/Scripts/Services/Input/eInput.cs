@@ -1,0 +1,4 @@
+public enum eInput
+{
+    playerMoveInput
+}
