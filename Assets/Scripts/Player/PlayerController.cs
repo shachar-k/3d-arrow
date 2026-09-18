@@ -10,6 +10,8 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
     [SerializeField]
     private float _turnRate = 0.25f;
     private Quaternion _defualtRotation;
+    private Vector3 _cameraDistance;
+    private Quaternion _cameraRotationOffset;
 
     #endregion
 
@@ -29,6 +31,9 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         this.Rigidbody = this.GetComponent<Rigidbody>();
         this._defualtRotation = this.transform.rotation;
         this.MainCamera = Camera.main;
+        this._cameraRotationOffset = Quaternion.Euler(0f, 180f, 0f);
+        this.MainCamera.transform.rotation = this._cameraRotationOffset;
+        this._cameraDistance = this.MainCamera.transform.position - this.transform.position;
     }
 
     void FixedUpdate()
@@ -46,6 +51,14 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         {
             this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, this._defualtRotation, _turnRate));
         }
+    }
 
+    void LateUpdate()
+    {
+        this.MainCamera.transform.position = this.transform.position + this._cameraDistance;
+
+        Quaternion playerTilt = this.Rigidbody.rotation * Quaternion.Inverse(this._defualtRotation);
+        Quaternion targetRotation = this._cameraRotationOffset * playerTilt;
+        this.MainCamera.transform.rotation = Quaternion.Slerp(this.MainCamera.transform.rotation, targetRotation, _turnRate);
     }
 }
