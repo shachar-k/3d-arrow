@@ -1,16 +1,35 @@
-using Unity.VisualScripting;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : Injectable<GameManager, IGameManager>
+public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 {
+    #region DataMembers
+
     [SerializeField]
-    private GameSettings _gameSettings ;
+    private GameSettings _gameSettings;
+
+    [SerializeField]
+    private GameObject _plane;
+
+    #endregion
+
+    #region Properties
 
     public GameSettings GameSettings => this._gameSettings;
 
+    private eGameStatus Status {get;set;}
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private Dictionary<int, Dictionary<int,GameObject>> planeMatrice {get;set;}
     
+    #endregion
+
+    #region Methods
+
+    public bool IsGameRunning()
+    {
+        return Status == eGameStatus.Running;
+    }
+
     protected override void Start()
     {
         base.Start();
@@ -20,6 +39,8 @@ public class GameManager : Injectable<GameManager, IGameManager>
     // Update is called once per frame
     void Update()
     {
-        
+
     }
+
+    #endregion
 }

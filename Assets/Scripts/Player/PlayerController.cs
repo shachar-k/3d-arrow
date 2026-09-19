@@ -5,7 +5,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
     #region DataMembers
     private Quaternion _defualtRotation;
     private Vector3 _cameraDistance;
-    private Quaternion _cameraRotationOffset;
+    private Quaternion _cameraRotationOffset = Quaternion.Euler(0f, 180f, 0f);
 
     #endregion
 
@@ -18,23 +18,35 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
     private GameSettings GameSettings {get;set;}
 
+    private IGameManager GameManager {get;set;}
+
     #endregion
 
     protected override void Start()
     {
         base.Start();
-        this.InputManager = this.Container.Resolve<IInputManager>();
-        this.GameSettings = this.Container.Resolve<GameSettings>();
-        this.Rigidbody = this.GetComponent<Rigidbody>();
+        InitializeProperties();
         this._defualtRotation = this.transform.rotation;
-        this.MainCamera = Camera.main;
-        this._cameraRotationOffset = Quaternion.Euler(0f, 180f, 0f);
         this.MainCamera.transform.rotation = this._cameraRotationOffset;
         this._cameraDistance = this.MainCamera.transform.position - this.transform.position;
     }
 
+    private void InitializeProperties()
+    {
+        this.InputManager = this.Container.Resolve<IInputManager>();
+        this.GameSettings = this.Container.Resolve<GameSettings>();
+        this.GameManager = this.Container.Resolve<IGameManager>();
+        this.Rigidbody = this.GetComponent<Rigidbody>();
+        this.MainCamera = Camera.main;
+    }
+
     void FixedUpdate()
     {
+        if (!this.GameManager.IsGameRunning())
+        {
+            return;
+        }
+
         var direction = this.InputManager.GetInputValue<float>(eInput.playerMoveInput);
 
         if(direction != 0)
@@ -52,9 +64,14 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
     void LateUpdate()
     {
+        if (!this.GameManager.IsGameRunning())
+        {
+            return;
+        }
+
         this.MainCamera.transform.position = this.transform.position + this._cameraDistance;
 
-        Quaternion playerTilt = this.Rigidbody.rotation * Quaternion.Inverse(this._defualtRotation);
+        Quaternion playerTilt = this.Rigidbody.rotation * Quaternion.Inverse(this._defualtRotation);// get the rotation done by removing the defualt rotation from rotation
         Quaternion targetRotation = this._cameraRotationOffset * playerTilt;
         this.MainCamera.transform.rotation = Quaternion.Slerp(this.MainCamera.transform.rotation, targetRotation, this.GameSettings.TurnRate);
     }
