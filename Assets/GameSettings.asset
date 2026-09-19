@@ -15,3 +15,4 @@ MonoBehaviour:
   Movespeed: 0.3
   TurnAngle: 30
   TurnRate: 0.25
+  planeStartLocation: {x: 0, y: -0.27, z: 0}

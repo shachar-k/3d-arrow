@@ -5,7 +5,7 @@ public class ObjectPoolMatrice<T> where T : class
 {
     #region Properties
 
-    private Dictionary<int, Dictionary<int, T>> matrice { get; set; }
+    private Dictionary<int, Dictionary<int, T>> matrice { get; set; } = new Dictionary<int, Dictionary<int, T>>();
 
     #endregion
 
@@ -13,7 +13,7 @@ public class ObjectPoolMatrice<T> where T : class
 
     public T this[int x, int y]
     {
-        get => matrice[x][y];
+        get => this.GetObject(x,y);
         set => this.AddObject(x, y, value);
     }
 
@@ -21,7 +21,6 @@ public class ObjectPoolMatrice<T> where T : class
     {
         if(!matrice.ContainsKey(x) || !matrice[x].ContainsKey(y))
         {
-            Debug.Log($"Attempting to access ${x} , ${y} which is missing from matrice");
             return null;
         }
 
