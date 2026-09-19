@@ -480,6 +480,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d6185aff1d304845bd4c32386adcef3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  _gameSettings: {fileID: 11400000, guid: f3204237e50429e4ea4663349853eaae, type: 2}
 --- !u!1001 &1770553599
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -572,9 +573,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66d7aa399bc1ea94095fbc7887a57aa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _movespeed: 0.3
-  _turnAngle: 30
-  _turnRate: 0.25
 --- !u!64 &1770553605
 MeshCollider:
   m_ObjectHideFlags: 0
