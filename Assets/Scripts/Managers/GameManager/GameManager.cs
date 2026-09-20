@@ -3,8 +3,13 @@ using UnityEngine;
 
 public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 {
+    #region Consts
     private const int MAX_PLANES = 3;
     private const int DONT_DELETE = -999;
+
+    private const float TIME_TO_WAIT_BEFORE_SPAWN = 0.5f;
+
+    #endregion
     #region DataMembers
 
     [SerializeField]
@@ -22,6 +27,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     private eGameStatus Status { get; set; }
 
     private ObjectPoolMatrice<GameObject> PlaneMatrice { get; set; } = new ObjectPoolMatrice<GameObject>();
+
+    private float TimeSinceLastSpawn { get; set; } = 0f;
 
     #endregion
 
@@ -48,7 +55,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     private void InitGame()
     {
         this.Status = eGameStatus.Running;
-        SpawnPlanes();
+        this.TimeSinceLastSpawn = Time.time;
+        this.SpawnPlanes();
     }
 
     private void SpawnPlanes()
@@ -67,6 +75,11 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     public void SpawnPlaneByCollison(Collider other)
     {
+        if(Time.time - this.TimeSinceLastSpawn < TIME_TO_WAIT_BEFORE_SPAWN)
+        {
+            return;
+        }
+
         Debug.Log($"Collision Detected with: {other.gameObject.name}");
         Bounds bounds = this.GetBounds(other.gameObject) ?? new Bounds();
         Vector2 pos = this.GetGridPosition(other.transform.position, bounds);
@@ -77,6 +90,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     private void CalcAdd(Vector2 pos)
     {
         Vector2 posToAdd = GetPosToAdd(pos);
+
         if (posToAdd.x != DONT_DELETE)
         {
             for (int y = 0; y < MAX_PLANES; y++)
@@ -176,7 +190,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         var obj = this.PlaneMatrice[x, y];
         if (obj != null)
         {
-            this.PlaneMatrice[x, y] = null; 
+            this.PlaneMatrice[x, y] = null;
             Destroy(obj);
 
         }
