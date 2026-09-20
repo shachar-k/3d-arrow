@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
 public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 {
     #region DataMembers
@@ -41,7 +40,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     // Update is called once per frame
     void Update()
     {
-        SpawnPlanes();
+        
     }
 
     private void InitGame()
@@ -58,16 +57,37 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
             {
                 if (this.PlaneMatrice[x, y] == null)
                 {
-                    var obj = Instantiate(this._plane, this.GameSettings.planeStartLocation, Quaternion.identity);
-                    obj.transform.position = getNewPosOfGrid(x, y, obj);
-                    obj.transform.parent = this.transform;
-                    this.PlaneMatrice[x,y] = obj;
+                    this.AddPlane(x, y);
                 }
             }
         }
     }
+    
+     public void SpawnPlaneByCollison(Collider other)
+    {
+        Bounds bounds = this.GetBounds(other.gameObject) ?? new Bounds();
+        Vector2 pos = this.GetGridPosition(other.transform.position, bounds);
+        Debug.Log($"Collision at ${pos.x} {pos.y}");
+    }
 
-    private Vector3 getNewPosOfGrid(int x, int y, GameObject obj)
+    private void AddPlane(int x, int y)
+    {
+        var obj = Instantiate(this._plane, this.GameSettings.planeStartLocation, Quaternion.identity);
+        obj.transform.position = this.GetNewPosOfGrid(x, y, obj);
+        obj.transform.parent = this.transform;
+        this.PlaneMatrice[x, y] = obj;
+    }
+
+    private Vector2 GetGridPosition(Vector3 pos, Bounds bounds)
+    {
+        var size = bounds.size;
+        Vector3 initialPos = this.GameSettings.planeStartLocation;
+        float xPosInGrid = (pos.x - initialPos.x) / size.x;  
+        float yPosInGrid = (pos.z - initialPos.z) / size.z; 
+        return new Vector2(xPosInGrid,yPosInGrid);
+    }
+
+    private Vector3 GetNewPosOfGrid(int x, int y, GameObject obj)
     {
         var bounds = this.GetBounds(obj) ?? new Bounds();
         var size = bounds.size;

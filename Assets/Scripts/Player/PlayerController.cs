@@ -40,6 +40,13 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         this.MainCamera = Camera.main;
     }
 
+    
+    void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == Consts.PlaneTag)
+        this.GameManager.SpawnPlaneByCollison(other);
+    }
+
     void FixedUpdate()
     {
         if (!this.GameManager.IsGameRunning())
