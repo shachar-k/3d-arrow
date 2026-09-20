@@ -63,7 +63,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     {
         for (int x = -1; x < MAX_PLANES - 1; x++)
         {
-            for (int y = 0; y < MAX_PLANES; y++)
+            for (int y = 0; y > -MAX_PLANES; y--)
             {
                 if (this.PlaneMatrice[x, y] == null)
                 {
@@ -131,27 +131,25 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     {
         Vector2 max = this.PlaneMatrice.MaxPoint;
         Vector2 min = this.PlaneMatrice.MinPoint;
-        Vector2 posToAdd = Vector2.zero;
-        Vector2 posToDelete = Vector2.zero;
+        Vector2 posToAdd = Vector2.zero * DONT_DELETE;
+        Vector2 posToDelete = Vector2.zero * DONT_DELETE;
 
         if (pos.x == max.x)
         {
-            posToAdd.x = max.x + 1;
+            posToAdd= new Vector2(max.x + 1, pos.y);
             posToDelete.x = min.x;
         }
         else if (pos.x == min.x)
         {
-            posToAdd.x = min.x - 1;
+            posToAdd= new Vector2(min.x - 1, pos.y);
             posToDelete.x = max.x;
         }
-        else
-        {
-            posToAdd.x = DONT_DELETE;
-            posToDelete.x = DONT_DELETE;
-        }
 
-        posToAdd.y = pos.y == max.y ? max.y + 1 : DONT_DELETE;
-        posToDelete.y = pos.y == max.y ? min.y : DONT_DELETE;
+        if(pos.y == min.y)
+        {
+            posToAdd.y =  min.y - 1; 
+            posToDelete.y =  max.y ;
+        }
 
         return new System.Tuple<Vector2, Vector2>(posToAdd, posToDelete);
     }
@@ -159,7 +157,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private void AddPlane(int x, int y)
     {
-        var obj = Instantiate(this._plane, this.GameSettings.planeStartLocation, Quaternion.identity);
+        var obj = Instantiate(this._plane, this.GameSettings.PlaneStartLocation, Quaternion.identity);
         obj.transform.position = this.GetNewPosOfGrid(x, y, obj);
         obj.transform.parent = this.transform;
         this.PlaneMatrice[x, y] = obj;
@@ -179,7 +177,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     private Vector2 GetGridPosition(Vector3 pos, Bounds bounds)
     {
         var size = bounds.size;
-        Vector3 initialPos = this.GameSettings.planeStartLocation;
+        Vector3 initialPos = this.GameSettings.PlaneStartLocation;
         float xPosInGrid = (pos.x - initialPos.x) / size.x;
         float yPosInGrid = (pos.z - initialPos.z) / size.z;
         return new Vector2(xPosInGrid, yPosInGrid);
@@ -189,9 +187,9 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     {
         var bounds = this.GetBounds(obj) ?? new Bounds();
         var size = bounds.size;
-        Vector3 initialPos = this.GameSettings.planeStartLocation;
+        Vector3 initialPos = this.GameSettings.PlaneStartLocation;
         float newXpos = initialPos.x + x * size.x;
-        float newZpos = initialPos.z + -y * size.z;
+        float newZpos = initialPos.z + y * size.z;
         return new Vector3(newXpos, initialPos.y, newZpos);
     }
 

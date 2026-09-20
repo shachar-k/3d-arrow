@@ -74,7 +74,7 @@ public class ObjectPoolMatrice<T> where T : class
             this.MinPoint = new Vector2(this.MinPoint.x, y + 1);
         }
 
-        Debug.Log($"Updated Bounds Removal: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
+       // Debug.Log($"Updated Bounds Removal: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
 
     }
 
@@ -122,7 +122,7 @@ public class ObjectPoolMatrice<T> where T : class
             this.MinPoint = new Vector2(this.MinPoint.x, y);
         }
 
-        Debug.Log($"Updated Bounds: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
+        //Debug.Log($"Updated Bounds: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
     }
     #endregion
 }

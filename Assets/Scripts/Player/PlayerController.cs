@@ -54,19 +54,21 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
             return;
         }
 
+        Vector3 newpos  = this.transform.position + Vector3.back * this.GameSettings.BaseSpeed * Time.fixedDeltaTime;
         var direction = this.InputManager.GetInputValue<float>(eInput.playerMoveInput);
 
         if(direction != 0)
         {
-            Vector3 newpos = this.transform.position + Vector3.left *direction * this.GameSettings.Movespeed;
+            newpos += Vector3.left *direction * this.GameSettings.Movespeed;
             Quaternion targetRotation = Quaternion.Euler(this._defualtRotation.eulerAngles + new Vector3( this.GameSettings.TurnAngle * direction, 0, 0));    
             this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, targetRotation, this.GameSettings.TurnRate));
-            this.Rigidbody.MovePosition(newpos);
         }
         else
         {
             this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, this._defualtRotation, this.GameSettings.TurnRate));
-        }
+        } 
+        
+        this.Rigidbody.MovePosition(newpos);
     }
 
     void LateUpdate()
