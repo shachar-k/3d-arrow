@@ -75,7 +75,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     public void SpawnPlaneByCollison(Collider other)
     {
-        if(Time.time - this.TimeSinceLastSpawn < TIME_TO_WAIT_BEFORE_SPAWN)
+        if (Time.time - this.TimeSinceLastSpawn < TIME_TO_WAIT_BEFORE_SPAWN)
         {
             return;
         }
@@ -83,14 +83,14 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         Debug.Log($"Collision Detected with: {other.gameObject.name}");
         Bounds bounds = this.GetBounds(other.gameObject) ?? new Bounds();
         Vector2 pos = this.GetGridPosition(other.transform.position, bounds);
-        this.CalcAdd(pos);
-        this.CalcDeletion(pos);
+        var posToAddAndDelete = this.GetPosToAddAndDelete(pos);
+        Debug.Log($"Pos to Add: {posToAddAndDelete.Item1}, Pos to Delete: {posToAddAndDelete.Item2}");
+        this.CalcAdd(posToAddAndDelete.Item1);
+        this.CalcDeletion(posToAddAndDelete.Item2);
     }
 
-    private void CalcAdd(Vector2 pos)
+    private void CalcAdd(Vector2 posToAdd)
     {
-        Vector2 posToAdd = GetPosToAdd(pos);
-
         if (posToAdd.x != DONT_DELETE)
         {
             for (int y = 0; y < MAX_PLANES; y++)
@@ -108,10 +108,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         }
     }
 
-    private void CalcDeletion(Vector2 pos)
+    private void CalcDeletion(Vector2 posToDelete)
     {
-        Vector2 posToDelete = GetPosToDelete(pos);
-
         if (posToDelete.x != DONT_DELETE)
         {
             for (int y = 0; y < MAX_PLANES; y++)
@@ -129,53 +127,35 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         }
     }
 
-    private Vector2 GetPosToAdd(Vector2 pos)
+    private System.Tuple<Vector2, Vector2> GetPosToAddAndDelete(Vector2 pos)
     {
         Vector2 max = this.PlaneMatrice.MaxPoint;
         Vector2 min = this.PlaneMatrice.MinPoint;
         Vector2 posToAdd = Vector2.zero;
-
-        if (pos.x == max.x)
-        {
-            posToAdd.x = max.x + 1;
-        }
-        else if (pos.x == min.x)
-        {
-            posToAdd.x = min.x - 1;
-        }
-        else
-        {
-            posToAdd.x = DONT_DELETE;
-        }
-
-        posToAdd.y = pos.y == max.y ? max.y + 1 : DONT_DELETE;
-
-        return posToAdd;
-    }
-
-    private Vector2 GetPosToDelete(Vector2 pos)
-    {
-        Vector2 max = this.PlaneMatrice.MaxPoint;
-        Vector2 min = this.PlaneMatrice.MinPoint;
         Vector2 posToDelete = Vector2.zero;
 
         if (pos.x == max.x)
         {
+            posToAdd.x = max.x + 1;
             posToDelete.x = min.x;
         }
         else if (pos.x == min.x)
         {
+            posToAdd.x = min.x - 1;
             posToDelete.x = max.x;
         }
         else
         {
+            posToAdd.x = DONT_DELETE;
             posToDelete.x = DONT_DELETE;
         }
 
+        posToAdd.y = pos.y == max.y ? max.y + 1 : DONT_DELETE;
         posToDelete.y = pos.y == max.y ? min.y : DONT_DELETE;
 
-        return posToDelete;
+        return new System.Tuple<Vector2, Vector2>(posToAdd, posToDelete);
     }
+
 
     private void AddPlane(int x, int y)
     {
