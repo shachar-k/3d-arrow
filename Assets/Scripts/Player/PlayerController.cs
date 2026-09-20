@@ -3,15 +3,9 @@ using UnityEngine;
 public class PlayerController : Injectable<PlayerController, IPlayerContoller>, IPlayerContoller
 {
     #region DataMembers
-    [SerializeField]
-    private float _movespeed = 0.3f;
-    [SerializeField]
-    private int _turnAngle = 30;
-    [SerializeField]
-    private float _turnRate = 0.25f;
     private Quaternion _defualtRotation;
     private Vector3 _cameraDistance;
-    private Quaternion _cameraRotationOffset;
+    private Quaternion _cameraRotationOffset = Quaternion.Euler(0f, 180f, 0f);
 
     #endregion
 
@@ -22,43 +16,70 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
     private Rigidbody Rigidbody {get;set;}
 
+    private GameSettings GameSettings {get;set;}
+
+    private IGameManager GameManager {get;set;}
+
     #endregion
 
     protected override void Start()
     {
         base.Start();
-        this.InputManager = this.Container.Resolve<IInputManager>();
-        this.Rigidbody = this.GetComponent<Rigidbody>();
+        InitializeProperties();
         this._defualtRotation = this.transform.rotation;
-        this.MainCamera = Camera.main;
-        this._cameraRotationOffset = Quaternion.Euler(0f, 180f, 0f);
         this.MainCamera.transform.rotation = this._cameraRotationOffset;
         this._cameraDistance = this.MainCamera.transform.position - this.transform.position;
     }
 
+    private void InitializeProperties()
+    {
+        this.InputManager = this.Container.Resolve<IInputManager>();
+        this.GameSettings = this.Container.Resolve<GameSettings>();
+        this.GameManager = this.Container.Resolve<IGameManager>();
+        this.Rigidbody = this.GetComponent<Rigidbody>();
+        this.MainCamera = Camera.main;
+    }
+
+    
+    void OnTriggerEnter(Collider other)
+    {
+        if(other.tag == Consts.PlaneTag)
+        this.GameManager.SpawnPlaneByCollison(other);
+    }
+
     void FixedUpdate()
     {
+        if (!this.GameManager.IsGameRunning())
+        {
+            return;
+        }
+
         var direction = this.InputManager.GetInputValue<float>(eInput.playerMoveInput);
 
         if(direction != 0)
         {
-            Vector3 newpos = this.transform.position + Vector3.left *direction * _movespeed;
-            Quaternion targetRotation = Quaternion.Euler(this._defualtRotation.eulerAngles + new Vector3( _turnAngle * direction, 0, 0));    
-            this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, targetRotation, _turnRate));
+            Vector3 newpos = this.transform.position + Vector3.left *direction * this.GameSettings.Movespeed;
+            Quaternion targetRotation = Quaternion.Euler(this._defualtRotation.eulerAngles + new Vector3( this.GameSettings.TurnAngle * direction, 0, 0));    
+            this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, targetRotation, this.GameSettings.TurnRate));
             this.Rigidbody.MovePosition(newpos);
         }
         else
         {
-            this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, this._defualtRotation, _turnRate));
+            this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, this._defualtRotation, this.GameSettings.TurnRate));
         }
     }
 
     void LateUpdate()
     {
+        if (!this.GameManager.IsGameRunning())
+        {
+            return;
+        }
+
         this.MainCamera.transform.position = this.transform.position + this._cameraDistance;
 
-        Quaternion playerTilt = this.Rigidbody.rotation * Quaternion.Inverse(this._defualtRotation);
+        Quaternion playerTilt = this.Rigidbody.rotation * Quaternion.Inverse(this._defualtRotation);// get the rotation done by removing the defualt rotation from rotation
         Quaternion targetRotation = this._cameraRotationOffset * playerTilt;
-        this.MainCamera.transform.rotation = Quaternion.Slerp(this.MainCamera.transform.rotation, targetRotation, _turnRate);
+        this.MainCamera.transform.rotation = Quaternion.Slerp(this.MainCamera.transform.rotation, targetRotation, this.GameSettings.TurnRate);
     }
 }
