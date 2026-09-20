@@ -18,7 +18,7 @@ public class ObjectPoolMatrice<T> where T : class
     {
         get => this.GetObject(x, y);
         set
-        {            
+        {
             if (value == null)
             {
                 this.RemoveObject(x, y);
@@ -45,26 +45,27 @@ public class ObjectPoolMatrice<T> where T : class
         if (matrice.ContainsKey(x) && matrice[x].ContainsKey(y))
         {
             matrice[x].Remove(y);
+            
             if (matrice[x].Count == 0)
             {
                 matrice.Remove(x);
+
+                if (x == this.MaxPoint.x)
+                {
+                    this.MaxPoint = new Vector2(x - 1, this.MaxPoint.y);
+                }
+                else if (x == this.MinPoint.x)
+                {
+                    this.MinPoint = new Vector2(x + 1, this.MinPoint.y);
+                }
             }
-            
+
             this.UpdateBoundsAfterRemoval(x, y);
         }
     }
 
     private void UpdateBoundsAfterRemoval(int x, int y)
     {
-        if (x == this.MaxPoint.x)
-        {
-            this.MaxPoint = new Vector2(x - 1, this.MaxPoint.y);
-        }
-        else if (x == this.MinPoint.x)
-        {
-            this.MinPoint = new Vector2(x + 1, this.MinPoint.y);
-        }
-
         if (y == this.MaxPoint.y)
         {
             this.MaxPoint = new Vector2(this.MaxPoint.x, y - 1);
@@ -74,8 +75,7 @@ public class ObjectPoolMatrice<T> where T : class
             this.MinPoint = new Vector2(this.MinPoint.x, y + 1);
         }
 
-       // Debug.Log($"Updated Bounds Removal: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
-
+        // Debug.Log($"Updated Bounds Removal: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
     }
 
     private void AddObject(int x, int y, T obj)

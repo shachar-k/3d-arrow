@@ -93,7 +93,10 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     {
         if (posToAdd.x != DONT_DELETE)
         {
-            for (int y = 0; y < MAX_PLANES; y++)
+            int minY = (int)this.PlaneMatrice.MinPoint.y;
+            int maxY = (int)this.PlaneMatrice.MaxPoint.y;
+
+            for (int y = minY; y <= maxY; y++)
             {
                 this.AddPlane((int)posToAdd.x, y);
             }
@@ -101,7 +104,10 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
         if (posToAdd.y != DONT_DELETE)
         {
-            for (int x = 0; x < MAX_PLANES; x++)
+            int minX = (int)this.PlaneMatrice.MinPoint.x;
+            int maxX = (int)this.PlaneMatrice.MaxPoint.x;
+
+            for (int x = minX; x <= maxX; x++)
             {
                 this.AddPlane(x, (int)posToAdd.y);
             }
@@ -112,7 +118,10 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     {
         if (posToDelete.x != DONT_DELETE)
         {
-            for (int y = 0; y < MAX_PLANES; y++)
+            int minY = (int)this.PlaneMatrice.MinPoint.y;
+            int maxY = (int)this.PlaneMatrice.MaxPoint.y;
+
+            for (int y = minY; y <= maxY; y++)
             {
                 this.DeletePlane((int)posToDelete.x, y);
             }
@@ -120,7 +129,10 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
         if (posToDelete.y != DONT_DELETE)
         {
-            for (int x = 0; x < MAX_PLANES; x++)
+            int minX = (int)this.PlaneMatrice.MinPoint.x;
+            int maxX = (int)this.PlaneMatrice.MaxPoint.x;
+
+            for (int x = minX; x <= maxX; x++)
             {
                 this.DeletePlane(x, (int)posToDelete.y);
             }
@@ -131,24 +143,29 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     {
         Vector2 max = this.PlaneMatrice.MaxPoint;
         Vector2 min = this.PlaneMatrice.MinPoint;
-        Vector2 posToAdd = Vector2.zero * DONT_DELETE;
-        Vector2 posToDelete = Vector2.zero * DONT_DELETE;
+        Vector2 posToAdd = new Vector2(DONT_DELETE, DONT_DELETE);
+        Vector2 posToDelete = new Vector2(DONT_DELETE, DONT_DELETE);
 
         if (pos.x == max.x)
         {
-            posToAdd= new Vector2(max.x + 1, pos.y);
+            posToAdd.x = max.x + 1;
             posToDelete.x = min.x;
         }
         else if (pos.x == min.x)
         {
-            posToAdd= new Vector2(min.x - 1, pos.y);
+            posToAdd.x = min.x - 1;
             posToDelete.x = max.x;
         }
 
-        if(pos.y == min.y)
+        if (pos.y == max.y)
         {
-            posToAdd.y =  min.y - 1; 
-            posToDelete.y =  max.y ;
+            posToAdd.y = max.y + 1;
+            posToDelete.y = min.y;
+        }
+        else if (pos.y == min.y)
+        {
+            posToAdd.y = min.y - 1;
+            posToDelete.y = max.y;
         }
 
         return new System.Tuple<Vector2, Vector2>(posToAdd, posToDelete);
