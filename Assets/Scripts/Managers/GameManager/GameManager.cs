@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 {
+    private const int MAX_PLANES = 3;
+    private const int DONT_DELETE = -999;
     #region DataMembers
 
     [SerializeField]
@@ -40,7 +42,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     private void InitGame()
@@ -51,9 +53,9 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private void SpawnPlanes()
     {
-        for (int x = 0; x < 3; x++)
+        for (int x = 0; x < MAX_PLANES; x++)
         {
-            for (int y = 0; y < 3; y++)
+            for (int y = 0; y < MAX_PLANES; y++)
             {
                 if (this.PlaneMatrice[x, y] == null)
                 {
@@ -62,12 +64,103 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
             }
         }
     }
-    
-     public void SpawnPlaneByCollison(Collider other)
+
+    public void SpawnPlaneByCollison(Collider other)
     {
+        Debug.Log($"Collision Detected with: {other.gameObject.name}");
         Bounds bounds = this.GetBounds(other.gameObject) ?? new Bounds();
         Vector2 pos = this.GetGridPosition(other.transform.position, bounds);
-        Debug.Log($"Collision at ${pos.x} {pos.y}");
+        this.CalcAdd(pos);
+        this.CalcDeletion(pos);
+    }
+
+    private void CalcAdd(Vector2 pos)
+    {
+        Vector2 posToAdd = GetPosToAdd(pos);
+        if (posToAdd.x != DONT_DELETE)
+        {
+            for (int y = 0; y < MAX_PLANES; y++)
+            {
+                this.AddPlane((int)posToAdd.x, y);
+            }
+        }
+
+        if (posToAdd.y != DONT_DELETE)
+        {
+            for (int x = 0; x < MAX_PLANES; x++)
+            {
+                this.AddPlane(x, (int)posToAdd.y);
+            }
+        }
+    }
+
+    private void CalcDeletion(Vector2 pos)
+    {
+        Vector2 posToDelete = GetPosToDelete(pos);
+
+        if (posToDelete.x != DONT_DELETE)
+        {
+            for (int y = 0; y < MAX_PLANES; y++)
+            {
+                this.DeletePlane((int)posToDelete.x, y);
+            }
+        }
+
+        if (posToDelete.y != DONT_DELETE)
+        {
+            for (int x = 0; x < MAX_PLANES; x++)
+            {
+                this.DeletePlane(x, (int)posToDelete.y);
+            }
+        }
+    }
+
+    private Vector2 GetPosToAdd(Vector2 pos)
+    {
+        Vector2 max = this.PlaneMatrice.MaxPoint;
+        Vector2 min = this.PlaneMatrice.MinPoint;
+        Vector2 posToAdd = Vector2.zero;
+
+        if (pos.x == max.x)
+        {
+            posToAdd.x = max.x + 1;
+        }
+        else if (pos.x == min.x)
+        {
+            posToAdd.x = min.x - 1;
+        }
+        else
+        {
+            posToAdd.x = DONT_DELETE;
+        }
+
+        posToAdd.y = pos.y == max.y ? max.y + 1 : DONT_DELETE;
+
+        return posToAdd;
+    }
+
+    private Vector2 GetPosToDelete(Vector2 pos)
+    {
+        Vector2 max = this.PlaneMatrice.MaxPoint;
+        Vector2 min = this.PlaneMatrice.MinPoint;
+        Vector2 posToDelete = Vector2.zero;
+
+        if (pos.x == max.x)
+        {
+            posToDelete.x = min.x;
+        }
+        else if (pos.x == min.x)
+        {
+            posToDelete.x = max.x;
+        }
+        else
+        {
+            posToDelete.x = DONT_DELETE;
+        }
+
+        posToDelete.y = pos.y == max.y ? min.y : DONT_DELETE;
+
+        return posToDelete;
     }
 
     private void AddPlane(int x, int y)
@@ -78,13 +171,24 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.PlaneMatrice[x, y] = obj;
     }
 
+    private void DeletePlane(int x, int y)
+    {
+        var obj = this.PlaneMatrice[x, y];
+        if (obj != null)
+        {
+            this.PlaneMatrice[x, y] = null; 
+            Destroy(obj);
+
+        }
+    }
+
     private Vector2 GetGridPosition(Vector3 pos, Bounds bounds)
     {
         var size = bounds.size;
         Vector3 initialPos = this.GameSettings.planeStartLocation;
-        float xPosInGrid = (pos.x - initialPos.x) / size.x;  
-        float yPosInGrid = (pos.z - initialPos.z) / size.z; 
-        return new Vector2(xPosInGrid,yPosInGrid);
+        float xPosInGrid = (pos.x - initialPos.x) / size.x;
+        float yPosInGrid = (pos.z - initialPos.z) / size.z;
+        return new Vector2(xPosInGrid, yPosInGrid);
     }
 
     private Vector3 GetNewPosOfGrid(int x, int y, GameObject obj)
