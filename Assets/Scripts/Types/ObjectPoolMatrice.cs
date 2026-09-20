@@ -106,17 +106,19 @@ public class ObjectPoolMatrice<T> where T : class
             this.MaxPoint = new Vector2(x, this.MaxPoint.y);
         }
 
+        if (MinPoint.x >= x)
+        {
+            this.MinPoint = new Vector2(x, this.MinPoint.y);
+        }
+
+
         if (MaxPoint.y < y)
         {
             this.MaxPoint = new Vector2(this.MaxPoint.y, y);
         }
 
-        if (MinPoint.x > x)
-        {
-            this.MinPoint = new Vector2(x, this.MinPoint.y);
-        }
-
-        if (MinPoint.y > y)
+        
+        if (MinPoint.y >= y)
         {
             this.MinPoint = new Vector2(this.MinPoint.x, y);
         }

@@ -61,7 +61,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private void SpawnPlanes()
     {
-        for (int x = 0; x < MAX_PLANES; x++)
+        for (int x = -1; x < MAX_PLANES - 1; x++)
         {
             for (int y = 0; y < MAX_PLANES; y++)
             {
@@ -210,7 +210,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         var bounds = this.GetBounds(obj) ?? new Bounds();
         var size = bounds.size;
         Vector3 initialPos = this.GameSettings.planeStartLocation;
-        float newXpos = initialPos.x + (-1 + x) * size.x;
+        float newXpos = initialPos.x + x * size.x;
         float newZpos = initialPos.z + -y * size.z;
         return new Vector3(newXpos, initialPos.y, newZpos);
     }
