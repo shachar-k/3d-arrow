@@ -77,7 +77,7 @@ stateDiagram-v2
 | Parameter | What it controls | First guess |
 |---|---|---|
 | `baseSpeed` | Forward speed at the start of a run | 4 u/s |
-| `maxSpeed` | Forward speed ceiling — once reached, speed holds flat for the rest of the run | 16 u/s |
+| `maxRamp` | Forward ramp ceiling — once reached, speed holds flat for the rest of the run | 5  |
 | `rampFixedMinutes` | How many minutes elapse between each speed jump | 1 min |
 | `rampSpeed` | How much forward speed is added at each jump — trades against `rampFixedMinutes`; fewer, bigger jumps feel very different from many small ones | +2 u/s |
 | `turnRate` | How fast heading rotates per second while a turn is held | 90 °/s |

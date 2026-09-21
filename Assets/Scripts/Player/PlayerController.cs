@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerController : Injectable<PlayerController, IPlayerContoller>, IPlayerContoller
 {
+    private const int NO_VALUE = -999;
     #region DataMembers
     private Quaternion _defualtRotation;
     private Vector3 _cameraDistance;
@@ -12,13 +13,17 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
     #region Properties
     private IInputManager InputManager { get; set; }
 
-    private Camera MainCamera {get;set;}
+    private Camera MainCamera { get; set; }
 
-    private Rigidbody Rigidbody {get;set;}
+    private Rigidbody Rigidbody { get; set; }
 
-    private GameSettings GameSettings {get;set;}
+    private GameSettings GameSettings { get; set; }
 
-    private IGameManager GameManager {get;set;}
+    private IGameManager GameManager { get; set; }
+
+    private float TimeSinceRamp { get; set; } = NO_VALUE;
+
+    private int RampCount { get; set; } = 1;
 
     #endregion
 
@@ -40,11 +45,13 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         this.MainCamera = Camera.main;
     }
 
-    
+
     void OnTriggerEnter(Collider other)
     {
-        if(other.tag == Consts.PlaneTag)
-        this.GameManager.SpawnPlaneByCollison(other);
+        if (other.tag == Consts.PlaneTag)
+        {
+            this.GameManager.SpawnPlaneByCollison(other);
+        }
     }
 
     void FixedUpdate()
@@ -54,22 +61,37 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
             return;
         }
 
-        float speed =  this.GameSettings.BaseSpeed * Time.fixedDeltaTime;
-        Vector3 newpos  = this.transform.position + Vector3.back *speed;
+        this.CalcRamp();
+
+        float speed = this.GameSettings.BaseSpeed * Time.fixedDeltaTime *this.RampCount * this.GameSettings.RampSpeed;
+        Vector3 newpos = this.transform.position + Vector3.back * speed;
         var direction = this.InputManager.GetInputValue<float>(eInput.playerMoveInput);
 
-        if(direction != 0)
+        if (direction != 0)
         {
-            newpos += Vector3.left *direction * speed *this.GameSettings.MoveSpeedDiff;
-            Quaternion targetRotation = Quaternion.Euler(this._defualtRotation.eulerAngles + new Vector3( this.GameSettings.TurnAngle * direction, 0, 0));    
+            newpos += Vector3.left * direction * speed * this.GameSettings.MoveSpeedDiff;
+            Quaternion targetRotation = Quaternion.Euler(this._defualtRotation.eulerAngles + new Vector3(this.GameSettings.TurnAngle * direction, 0, 0));
             this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, targetRotation, this.GameSettings.TurnRate));
         }
         else
         {
             this.Rigidbody.MoveRotation(Quaternion.Slerp(this.Rigidbody.rotation, this._defualtRotation, this.GameSettings.TurnRate));
-        } 
-        
+        }
+
         this.Rigidbody.MovePosition(newpos);
+    }
+
+    private void CalcRamp()
+    {
+        if (this.TimeSinceRamp == NO_VALUE)
+        {
+            this.TimeSinceRamp = Time.time;
+        }
+        else if (Time.time - this.TimeSinceRamp >= this.GameSettings.RampFixedMinutes * 60 && this.RampCount <= this.GameSettings.MaxRamp)
+        {
+            this.RampCount++;
+            this.TimeSinceRamp = Time.time;
+        }
     }
 
     void LateUpdate()
