@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class ObjectPoolMatrice<T> where T : class
@@ -18,7 +19,7 @@ public class ObjectPoolMatrice<T> where T : class
     {
         get => this.GetObject(x, y);
         set
-        {            
+        {
             if (value == null)
             {
                 this.RemoveObject(x, y);
@@ -45,26 +46,18 @@ public class ObjectPoolMatrice<T> where T : class
         if (matrice.ContainsKey(x) && matrice[x].ContainsKey(y))
         {
             matrice[x].Remove(y);
+            
             if (matrice[x].Count == 0)
             {
                 matrice.Remove(x);
             }
-            
-            this.UpdateBoundsAfterRemoval(x, y);
+
+            this.UpdateBounds();
         }
     }
 
-    private void UpdateBoundsAfterRemoval(int x, int y)
+    private void UpdateBoundsAfterRemoval(int y)
     {
-        if (x == this.MaxPoint.x)
-        {
-            this.MaxPoint = new Vector2(x - 1, this.MaxPoint.y);
-        }
-        else if (x == this.MinPoint.x)
-        {
-            this.MinPoint = new Vector2(x + 1, this.MinPoint.y);
-        }
-
         if (y == this.MaxPoint.y)
         {
             this.MaxPoint = new Vector2(this.MaxPoint.x, y - 1);
@@ -74,8 +67,7 @@ public class ObjectPoolMatrice<T> where T : class
             this.MinPoint = new Vector2(this.MinPoint.x, y + 1);
         }
 
-        Debug.Log($"Updated Bounds Removal: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
-
+        // Debug.Log($"Updated Bounds Removal: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
     }
 
     private void AddObject(int x, int y, T obj)
@@ -96,32 +88,18 @@ public class ObjectPoolMatrice<T> where T : class
             xAxis[y] = obj;
         }
 
-        this.UpdateBounds(x, y);
+        this.UpdateBounds();
     }
 
-    private void UpdateBounds(int x, int y)
+    private void UpdateBounds()
     {
-        if (MaxPoint.x < x)
-        {
-            this.MaxPoint = new Vector2(x, this.MaxPoint.y);
-        }
+        int maxX = this.matrice.Keys.Max();
+        int minX = this.matrice.Keys.Min();
+        int maxY = this.matrice.Values.SelectMany(v => v.Keys).Max();
+        int minY = this.matrice.Values.SelectMany(v => v.Keys).Min();
 
-        if (MinPoint.x >= x)
-        {
-            this.MinPoint = new Vector2(x, this.MinPoint.y);
-        }
-
-
-        if (MaxPoint.y < y)
-        {
-            this.MaxPoint = new Vector2(this.MaxPoint.x, y);
-        }
-
-        if (MinPoint.y >= y)
-        {
-            this.MinPoint = new Vector2(this.MinPoint.x, y);
-        }
-
+        this.MaxPoint = new Vector2(maxX, maxY);
+        this.MinPoint = new Vector2(minX, minY);
         Debug.Log($"Updated Bounds: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
     }
     #endregion
