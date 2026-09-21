@@ -130,23 +130,23 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
         Vector2 posToAdd = new Vector2(DONT_DELETE, DONT_DELETE);
         Vector2 posToDelete = new Vector2(DONT_DELETE, DONT_DELETE);
 
-        if (pos.x == max.x)
+        if (pos.x >= max.x)
         {
             posToAdd.x = max.x + 1;
             posToDelete.x = min.x;
         }
-        else if (pos.x == min.x)
+        else if (pos.x <= min.x)
         {
             posToAdd.x = min.x - 1;
             posToDelete.x = max.x;
         }
 
-        if (pos.y == max.y)
+        if (pos.y >= max.y)
         {
             posToAdd.y = max.y + 1;
             posToDelete.y = min.y;
         }
-        else if (pos.y == min.y)
+        else if (pos.y <= min.y)
         {
             posToAdd.y = min.y - 1;
             posToDelete.y = max.y;
