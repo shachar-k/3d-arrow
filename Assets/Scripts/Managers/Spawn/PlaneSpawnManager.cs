@@ -14,7 +14,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
     [SerializeField]
     public GameObject plane;
-    
+
     #endregion
 
     #region Properties

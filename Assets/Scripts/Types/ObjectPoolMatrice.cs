@@ -45,6 +45,7 @@ public class ObjectPoolMatrice<T> where T : class
         if (matrice.ContainsKey(x) && matrice[x].ContainsKey(y))
         {
             matrice[x].Remove(y);
+            this.UpdateBoundsAfterRemoval(y);
             
             if (matrice[x].Count == 0)
             {
@@ -59,12 +60,10 @@ public class ObjectPoolMatrice<T> where T : class
                     this.MinPoint = new Vector2(x + 1, this.MinPoint.y);
                 }
             }
-
-            this.UpdateBoundsAfterRemoval(x, y);
         }
     }
 
-    private void UpdateBoundsAfterRemoval(int x, int y)
+    private void UpdateBoundsAfterRemoval(int y)
     {
         if (y == this.MaxPoint.y)
         {
