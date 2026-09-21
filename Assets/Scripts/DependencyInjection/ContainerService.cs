@@ -17,6 +17,7 @@ public class ContainerService : Singleton<ContainerService>, IContainerService, 
     {
         this.Register<ContainerService, IContainerService>(this);
         this.Register<InputManager, IInputManager>(InputManager.CreateInstance(this.gameObject));
+        
     }
 
     public void Register<T, I>(T instance)
