@@ -38,7 +38,7 @@ public class GameObjectPoolList
 
     #region Properties
 
-    public List<string> ObjectNames => this.Pools.Keys.ToList();
+    public List<string> ObjectsCanBeSpawned => this.Pools.Where(pair => pair.Value.CountInactive > 0).Select(pair => pair.Key).ToList();
     private Dictionary<string, ObjectPool<GameObject>> Pools { get; set; }
 
     #endregion

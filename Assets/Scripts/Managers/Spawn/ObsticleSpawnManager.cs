@@ -31,21 +31,62 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
 
      public void SpawnInSurrondingArea(Vector2 pos)
     {
-        throw new System.NotImplementedException();
+        SpawnObsticals(pos);
+        SpawnObsticals(pos + Vector2.up);
+        SpawnObsticals(pos + Vector2.left);
+        SpawnObsticals(pos + Vector2.right);
+        SpawnObsticals(pos + Vector2.one);
+        SpawnObsticals(pos + new Vector2(-1,1));
     }
 
     public void SpawnObsticals(Vector2 pos)
     {
-        throw new System.NotImplementedException();
+        int amount = Random.Range(this.GameSettings.ObstaclePoolPlaneMinSize, this.GameSettings.ObstaclePoolPlaneMaxSize);
+        StartCoroutine(SpawnObsticalsAsync(pos,amount));
     }
 
-    private IEnumerator SpawnObsticalsAsync(Vector2 pos, int amount)
+    private System.Collections.IEnumerator SpawnObsticalsAsync(Vector2 pos, int amount)
     {
         Bounds bounds = this.PlaneSpawnManager.GetPlaneBounds();
-        for (int i = 0; i <= amount; i++)
+
+        for (int i = 0; i < amount; i++)
         {
-            
+            Vector3 randomPosition = GetRandomPositionInBounds(bounds);
+            string randomObject = this.GetRandomPoolObject();
+            GameObject obj = this.objectsToSpawn.SpawnObject(randomObject, randomPosition);
+            this.UpdatePerPlaneMatrice(pos, obj);
+            yield return new WaitForSeconds(this.GameSettings.CooldownBetweenSpawns);
         }
+    }
+
+    private void UpdatePerPlaneMatrice(Vector2 pos, GameObject obj)
+    {
+        var list = this.objectsSpawnedPerMatrice[(int)pos.x, (int)pos.y];
+
+        if (list == null)
+        {
+            list = new List<GameObject>();
+        }
+
+        list.Add(obj);
+        this.objectsSpawnedPerMatrice[(int)pos.x, (int)pos.y] = list;
+    }
+
+    private Vector3 GetRandomPositionInBounds(Bounds bounds)
+    {
+        float x = Random.Range(bounds.min.x, bounds.max.x);
+        float z = Random.Range(bounds.min.z, bounds.max.z);
+        float y = bounds.center.y;
+
+        return new Vector3(x, y, z);
+    }
+
+    private string GetRandomPoolObject()
+    {
+        List<string> objNames = this.objectsToSpawn.ObjectsCanBeSpawned;
+        int i = Random.Range(0,objNames.Count -1);
+        
+        return objNames[i];
     }
     #endregion
 }
