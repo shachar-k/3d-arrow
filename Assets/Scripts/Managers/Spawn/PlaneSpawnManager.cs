@@ -34,12 +34,6 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
         base.Start();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
 
     public void SpawnPlanes()
     {
@@ -197,6 +191,11 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     private Bounds? GetBounds(GameObject gameObject)
     {
         return gameObject.GetComponent<MeshRenderer>()?.bounds;
+    }
+
+    public Bounds GetPlaneBounds()
+    {
+        return this.GetBounds(this.plane.gameObject) ?? new Bounds();
     }
     #endregion
 
