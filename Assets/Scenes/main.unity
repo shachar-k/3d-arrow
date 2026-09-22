@@ -469,6 +469,7 @@ GameObject:
   - component: {fileID: 1538190853}
   - component: {fileID: 1538190854}
   - component: {fileID: 1538190855}
+  - component: {fileID: 1538190856}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -521,6 +522,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlaneSpawnManager
   plane: {fileID: 6230550094707073980, guid: ea5d2ec0102aca440a2ac5ec8b8cf849, type: 3}
+--- !u!114 &1538190856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1538190851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8533437c1f8184940aecb4667d24a9f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ObsticleSpawnManager
+  objectsToSpawn:
+    prefabs: []
 --- !u!1001 &1770553599
 PrefabInstance:
   m_ObjectHideFlags: 0

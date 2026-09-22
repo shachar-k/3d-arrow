@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class ObjectPoolMatrice<T> where T : class
+public class ObjectMatrice<T> where T : class
 {
     #region Properties
 

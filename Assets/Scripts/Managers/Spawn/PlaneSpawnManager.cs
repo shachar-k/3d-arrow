@@ -21,7 +21,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
     public GameSettings GameSettings => this.Container.Resolve<GameSettings>();
 
-    private ObjectPoolMatrice<GameObject> PlaneMatrice { get; set; } = new ObjectPoolMatrice<GameObject>();
+    private ObjectMatrice<GameObject> PlaneMatrice { get; set; } = new ObjectMatrice<GameObject>();
 
     private float TimeSinceLastSpawn { get; set; } = 0f;
 
