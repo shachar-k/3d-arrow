@@ -1,30 +1,45 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
 
 [System.Serializable]
-public class GameObjectPoolList 
+public class GameObjectPoolList
 {
     #region DataMembers
 
     [SerializeField]
     private List<ObjectParameters> prefabs = new List<ObjectParameters>();
+    private Dictionary<int, ObjectPool<GameObject>> poolByUsedObj = new Dictionary<int, ObjectPool<GameObject>>();
 
     #endregion
 
+    #region C'Tors
     public GameObjectPoolList()
-    {        
+    {
         foreach (var prefab in prefabs)
         {
-            
+            var pool = new ObjectPool<GameObject>(
+                () => this.CreateObject(prefab.Prefab),
+                OnGetFromPool,
+                OnReturnToPool,
+                OnDestroy,
+                true,
+                prefab.Defualt,
+                prefab.Max
+            );
+
+            this.Pools.Add(prefab.Name, pool);
         }
     }
 
+    #endregion
+
     #region Properties
 
-    public int CountInactive => throw new System.NotImplementedException();
-    private Dictionary<string,ObjectPool<GameObject>> Pool { get; set; }
+    public List<string> ObjectNames => this.Pools.Keys.ToList();
+    private Dictionary<string, ObjectPool<GameObject>> Pools { get; set; }
 
     #endregion
 
@@ -32,22 +47,34 @@ public class GameObjectPoolList
 
     public void Clear()
     {
-        throw new System.NotImplementedException();
+        foreach (ObjectPool<GameObject> pool in this.Pools.Values)
+        {
+            pool.Clear();
+        }
     }
 
-    public GameObject Get()
+    public GameObject SpawnObject(string name, Vector3 pos)
     {
-        throw new System.NotImplementedException();
+        GameObject gameObject = this.Get(name);
+        gameObject.transform.position = pos;
+
+        return gameObject;
     }
 
-    public PooledObject<GameObject> Get(out GameObject v)
+    public GameObject Get(string name)
     {
-        throw new System.NotImplementedException();
+        GameObject obj = this.Pools[name].Get();
+        this.poolByUsedObj.Add(obj.GetInstanceID(), this.Pools[name]);
+
+        return obj;
     }
 
-    public void Release(GameObject element)
+    public void Release(GameObject pooledObj)
     {
-        throw new System.NotImplementedException();
+
+        int id = pooledObj.GetInstanceID();
+        this.poolByUsedObj[id].Release(pooledObj);
+        this.poolByUsedObj.Remove(id);
     }
 
     private GameObject CreateObject(GameObject prefab)
@@ -62,7 +89,7 @@ public class GameObjectPoolList
         pooledObj.SetActive(true);
     }
 
-     private void OnReturnToPool(GameObject pooledObj)
+    private void OnReturnToPool(GameObject pooledObj)
     {
         pooledObj.SetActive(false);
     }
