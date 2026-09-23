@@ -38,11 +38,11 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
      public void SpawnInSurrondingArea(Vector2 pos)
     {
         SpawnObsticals(pos);
-        SpawnObsticals(pos + Vector2.up);
+        SpawnObsticals(pos + Vector2.down);
         SpawnObsticals(pos + Vector2.left);
         SpawnObsticals(pos + Vector2.right);
-        SpawnObsticals(pos + Vector2.one);
-        SpawnObsticals(pos + new Vector2(-1,1));
+        SpawnObsticals(pos + new Vector2(1,-1));
+        SpawnObsticals(pos - Vector2.one);
     }
 
     public void SpawnObsticals(Vector2 pos)
