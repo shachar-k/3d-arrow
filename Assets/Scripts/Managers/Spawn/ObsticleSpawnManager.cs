@@ -18,7 +18,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
 
     private IPlaneSpawnManager PlaneSpawnManager { get; set; }
 
-    private GameObjectPoolList ObjectsToSpawn {get;set;}
+    private GameObjectPoolList ObjectsToSpawn { get; set; }
 
     private ObjectMatrice<List<GameObject>> ObjectsSpawnedPerMatrice { get; set; } = new ObjectMatrice<List<GameObject>>();
 
@@ -86,8 +86,8 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         {
             Vector3 randomPosition = GetRandomPositionInBounds(bounds);
             GameObject obj = this.ObjectsToSpawn.SpawnRandomObject(randomPosition);
-            obj.transform.localScale = Vector3.one *Random.Range(1,3); 
-            obj.GetComponent<MeshRenderer>().material.color = Random.ColorHSV();
+            obj.transform.localScale = Vector3.one * Random.Range(1, 3);
+            SetRandomColor(obj);
             this.UpdatePerPlaneMatrice(pos, obj);
 
             if (i % MAX_BLOCK_SIZE == 0)
@@ -111,6 +111,22 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
                 yield return new WaitForSeconds(this.GameSettings.CooldownBetweenSpawns);
             }
         }
+    }
+
+
+    private void SetRandomColor(GameObject obj)
+    {
+        var renderer = obj.GetComponent<MeshRenderer>();
+        if (renderer == null)
+        {
+            return;
+        }
+
+        Color color = Random.ColorHSV();
+        var mat = new Material(renderer.sharedMaterial);
+        mat.SetColor("_BaseColor", color);
+        mat.SetColor("_EmissionColor", color);
+        renderer.material = mat;
     }
 
     private void UpdatePerPlaneMatrice(Vector2 pos, GameObject obj)
