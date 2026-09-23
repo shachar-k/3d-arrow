@@ -57,6 +57,13 @@ public class GameObjectPoolList
         }
     }
 
+    public GameObject SpawnRandomObject(Vector3 pos)
+    {
+        int i = UnityEngine.Random.Range(0, this.prefabs.Count -1);
+        string name = this.prefabs[i].Name;
+        return this.SpawnObject(name,pos);
+    }
+
     public GameObject SpawnObject(string name, Vector3 pos)
     {
         GameObject gameObject = this.Get(name);

@@ -19,7 +19,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
 
     private IPlaneSpawnManager PlaneSpawnManager {get;set;}
 
-    private ObjectMatrice<List<GameObject>> objectsSpawnedPerMatrice { get; set; }
+    private ObjectMatrice<List<GameObject>> objectsSpawnedPerMatrice { get; set; } = new ObjectMatrice<List<GameObject>>();
 
     #endregion
 
@@ -58,8 +58,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         for (int i = 0; i < amount; i++)
         {
             Vector3 randomPosition = GetRandomPositionInBounds(bounds);
-            string randomObject = this.GetRandomPoolObject();
-            GameObject obj = this.objectsToSpawn.SpawnObject(randomObject, randomPosition);
+            GameObject obj = this.objectsToSpawn.SpawnRandomObject(randomPosition);
             this.UpdatePerPlaneMatrice(pos, obj);
             yield return new WaitForSeconds(this.GameSettings.CooldownBetweenSpawns);
         }
@@ -85,14 +84,6 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         float y = bounds.center.y;
 
         return new Vector3(x, y, z);
-    }
-
-    private string GetRandomPoolObject()
-    {
-        List<string> objNames = this.objectsToSpawn.ObjectsCanBeSpawned;
-        int i = Random.Range(0,objNames.Count -1);
-        
-        return objNames[i];
     }
     #endregion
 }
