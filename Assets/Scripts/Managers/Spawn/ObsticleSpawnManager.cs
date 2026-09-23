@@ -10,8 +10,6 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
     [SerializeField]
     private List<ObjectParameters> prefabs;
 
-    [SerializeField]
-    private GameObjectPoolList objectsToSpawn;
 
     #endregion
 
@@ -19,6 +17,8 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
     private GameSettings GameSettings { get; set; }
 
     private IPlaneSpawnManager PlaneSpawnManager { get; set; }
+
+    private GameObjectPoolList ObjectsToSpawn {get;set;}
 
     private ObjectMatrice<List<GameObject>> ObjectsSpawnedPerMatrice { get; set; } = new ObjectMatrice<List<GameObject>>();
 
@@ -30,7 +30,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         base.Start();
         this.GameSettings = this.Container.Resolve<GameSettings>();
         this.PlaneSpawnManager = this.Container.Resolve<IPlaneSpawnManager>();
-        this.objectsToSpawn = new GameObjectPoolList(prefabs);
+        this.ObjectsToSpawn = new GameObjectPoolList(prefabs);
         SpawnInSurrondingArea(Vector2.zero);
         this.PlaneSpawnManager.SpawnInSurrowndingArea += this.HandleSpawn;
         this.PlaneSpawnManager.DestroyPlane += this.HandleDestroy;
@@ -85,7 +85,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         for (int i = 0; i < amount; i++)
         {
             Vector3 randomPosition = GetRandomPositionInBounds(bounds);
-            GameObject obj = this.objectsToSpawn.SpawnRandomObject(randomPosition);
+            GameObject obj = this.ObjectsToSpawn.SpawnRandomObject(randomPosition);
             this.UpdatePerPlaneMatrice(pos, obj);
 
             if (i % MAX_BLOCK_SIZE == 0)
@@ -97,12 +97,12 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
 
     private System.Collections.IEnumerator DestroyObsticlesInPlaneAsync(Vector2 pos)
     {
-        List<GameObject> gameObjects = this.ObjectsSpawnedPerMatrice[(int)pos.x, (int)pos.y];
+        List<GameObject> gameObjects = this.ObjectsSpawnedPerMatrice[(int)pos.x, (int)pos.y] ?? new List<GameObject>();
 
         for (int i = 0; i < gameObjects.Count; i++)
         {
             GameObject gameObject = gameObjects[i];
-            this.objectsToSpawn.Release(gameObject);
+            this.ObjectsToSpawn.Release(gameObject);
 
             if (i % MAX_BLOCK_SIZE == 0)
             {

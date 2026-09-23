@@ -75,7 +75,12 @@ public class GameObjectPoolList
     public GameObject Get(string name)
     {
         GameObject obj = this.Pools[name].Get();
-        this.poolByUsedObj.Add(obj.GetInstanceID(), this.Pools[name]);
+        int key = obj.GetInstanceID();
+
+        if(!this.poolByUsedObj.ContainsKey(key))
+        {
+            this.poolByUsedObj.Add(key, this.Pools[name]);
+        }
 
         return obj;
     }
@@ -84,6 +89,12 @@ public class GameObjectPoolList
     {
 
         int id = pooledObj.GetInstanceID();
+
+        if (!poolByUsedObj.ContainsKey(id))
+        {
+            return;
+        }
+
         this.poolByUsedObj[id].Release(pooledObj);
         this.poolByUsedObj.Remove(id);
     }

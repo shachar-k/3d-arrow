@@ -29,6 +29,8 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
     private ObjectMatrice<GameObject> PlaneMatrice { get; set; } = new ObjectMatrice<GameObject>();
 
+    private GameObjectPoolList ObjectsToSpawn {get;set;}
+
     private float TimeSinceLastSpawn { get; set; } = 0f;
 
     #endregion
@@ -38,14 +40,24 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     protected override void Start()
     {
         base.Start();
+        this.ObjectsToSpawn = new GameObjectPoolList(new System.Collections.Generic.List<ObjectParameters>()
+        {
+            new ObjectParameters
+            {
+                Prefab = this.plane,
+                Defualt = MAX_PLANES,
+                Max = MAX_PLANES,
+                Name = Consts.PlaneTag
+            }
+        });
     }
 
 
     public void SpawnPlanes()
     {
         this.TimeSinceLastSpawn = Time.time;
-        // this.ObsticleSpawnManager.SpawnInSurrondingArea(Vector2.zero);
         this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
+        
         for (int x = -1; x < MAX_PLANES - 1; x++)
         {
             for (int y = 0; y > -MAX_PLANES; y--)
@@ -165,7 +177,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
     private void AddPlane(int x, int y)
     {
-        var obj = Instantiate(this.plane, this.GameSettings.PlaneStartLocation, Quaternion.identity);
+        var obj = this.ObjectsToSpawn.SpawnObject(Consts.PlaneTag, this.GameSettings.PlaneStartLocation);
         obj.transform.position = this.GetNewPosOfGrid(x, y, obj);
         obj.transform.parent = this.transform;
         this.PlaneMatrice[x, y] = obj;
@@ -174,11 +186,11 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     private void DeletePlane(int x, int y)
     {
         var obj = this.PlaneMatrice[x, y];
+
         if (obj != null)
         {
             this.PlaneMatrice[x, y] = null;
-            Destroy(obj);
-
+            this.ObjectsToSpawn.Release(obj);
         }
     }
 
