@@ -61,7 +61,11 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
             Vector3 randomPosition = GetRandomPositionInBounds(bounds);
             GameObject obj = this.objectsToSpawn.SpawnRandomObject(randomPosition);
             this.UpdatePerPlaneMatrice(pos, obj);
-            yield return new WaitForSeconds(this.GameSettings.CooldownBetweenSpawns);
+
+            if(i % 10 ==0)
+            {
+                yield return new WaitForSeconds(this.GameSettings.CooldownBetweenSpawns);
+            }
         }
     }
 
