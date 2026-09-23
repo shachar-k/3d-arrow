@@ -71,6 +71,11 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
         this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(pos));
     }
 
+    public Bounds GetPlaneBounds(Vector2 pos)
+    {
+        return this.GetBounds(this.PlaneMatrice[(int)pos.x,(int)pos.y]) ?? new Bounds();
+    }
+
     private void CalcAdd(Vector2 posToAdd)
     {
         if (posToAdd.x != DONT_DELETE)
@@ -195,11 +200,6 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     private Bounds? GetBounds(GameObject gameObject)
     {
         return gameObject.GetComponent<MeshRenderer>()?.bounds;
-    }
-
-    public Bounds GetPlaneBounds()
-    {
-        return this.GetBounds(this.plane.gameObject) ?? new Bounds();
     }
     #endregion
 

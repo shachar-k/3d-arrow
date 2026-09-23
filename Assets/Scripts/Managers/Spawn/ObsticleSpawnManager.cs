@@ -53,7 +53,8 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
 
     private System.Collections.IEnumerator SpawnObsticalsAsync(Vector2 pos, int amount)
     {
-        Bounds bounds = this.PlaneSpawnManager.GetPlaneBounds();
+        Bounds bounds = this.PlaneSpawnManager.GetPlaneBounds(pos);
+        Debug.Log($"bounds {bounds.min} {bounds.max}");
 
         for (int i = 0; i < amount; i++)
         {

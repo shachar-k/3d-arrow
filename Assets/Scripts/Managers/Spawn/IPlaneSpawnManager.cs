@@ -11,6 +11,6 @@ public interface IPlaneSpawnManager
     #region Methods
     public void SpawnPlanes();
     public void SpawnPlaneByCollison(Collider other);
-    public Bounds GetPlaneBounds();
+    public Bounds GetPlaneBounds(Vector2 pos);
     #endregion
 }
