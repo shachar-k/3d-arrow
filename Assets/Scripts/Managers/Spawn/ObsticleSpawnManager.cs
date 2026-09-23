@@ -73,7 +73,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         this.SpawnInSurrondingArea(args.Position);
     }
 
-    
+
     private void HandleSpawn(object sender, SpawnEventArgs args)
     {
         this.SpawnObsticals(args.Position);
@@ -91,9 +91,10 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
 
         for (int i = 0; i < amount; i++)
         {
-            Vector3 randomPosition = GetRandomPositionInBounds(bounds);
+            int scale = Random.Range(1, this.GameSettings.MaxSizeOfObject);
+            Vector3 randomPosition = this.GetRandomPositionInBounds(bounds, scale);
             GameObject obj = this.ObjectsToSpawn.SpawnRandomObject(randomPosition);
-            obj.transform.localScale = Vector3.one * Random.Range(1, 3);
+            obj.transform.localScale = Vector3.one * scale;
             SetRandomColor(obj);
             this.UpdatePerPlaneMatrice(pos, obj);
 
@@ -148,11 +149,11 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         this.ObjectsSpawnedPerMatrice[(int)pos.x, (int)pos.y] = list;
     }
 
-    private Vector3 GetRandomPositionInBounds(Bounds bounds)
+    private Vector3 GetRandomPositionInBounds(Bounds bounds, float scale)
     {
         float x = Random.Range(bounds.min.x, bounds.max.x);
         float z = Random.Range(bounds.min.z, bounds.max.z);
-        float y = bounds.center.y + 0.5f;
+        float y = bounds.center.y + 0.5f * scale;
 
         return new Vector3(x, y, z);
     }

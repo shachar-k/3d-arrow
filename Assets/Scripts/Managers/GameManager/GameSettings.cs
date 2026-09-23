@@ -12,6 +12,7 @@ public class GameSettings : ScriptableObject
     public int MaxRamp = 6;
     public float RampFixedMinutes=1f;
     public int ObstaclePoolPlaneMinSize = 7;
-    public int ObstaclePoolPlaneMaxSize = 11;
+    public int ObstaclePoolPlaneMaxSize = 15;
+    public int MaxSizeOfObject = 4;
     public float CooldownBetweenSpawns =0.5f;
 }
