@@ -21,6 +21,8 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
     public event EventHandler<SpawnEventArgs> DestroyPlane;
 
+    public event EventHandler<SpawnEventArgs> SpawnInPosition;
+
     #endregion
 
     #region Properties
@@ -56,6 +58,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     public void SpawnPlanes()
     {
         this.TimeSinceLastSpawn = Time.time;
+        this.SpawnInPosition?.Invoke(this, new SpawnEventArgs(Vector2.zero));
         this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
         
         for (int x = -1; x < MAX_PLANES - 1; x++)

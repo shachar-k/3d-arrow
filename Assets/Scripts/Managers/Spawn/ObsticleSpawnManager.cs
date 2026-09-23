@@ -32,19 +32,20 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         this.PlaneSpawnManager = this.Container.Resolve<IPlaneSpawnManager>();
         this.ObjectsToSpawn = new GameObjectPoolList(prefabs);
         SpawnInSurrondingArea(Vector2.zero);
-        this.PlaneSpawnManager.SpawnInSurrowndingArea += this.HandleSpawn;
+        this.PlaneSpawnManager.SpawnInSurrowndingArea += this.HandleSpawnSrroundingArea;
+        this.PlaneSpawnManager.SpawnInPosition += this.HandleSpawn;
         this.PlaneSpawnManager.DestroyPlane += this.HandleDestroy;
     }
 
     void OnDestroy()
     {
         this.PlaneSpawnManager.DestroyPlane -= this.HandleDestroy;
-        this.PlaneSpawnManager.SpawnInSurrowndingArea -= this.HandleSpawn;
+        this.PlaneSpawnManager.SpawnInSurrowndingArea -= this.HandleSpawnSrroundingArea;
+        this.PlaneSpawnManager.SpawnInPosition -= this.HandleSpawn;
     }
 
     public void SpawnInSurrondingArea(Vector2 pos)
     {
-        SpawnObsticals(pos);
         SpawnObsticals(pos + Vector2.down);
         SpawnObsticals(pos + Vector2.left);
         SpawnObsticals(pos + Vector2.right);
@@ -67,9 +68,15 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         StartCoroutine(SpawnObsticalsAsync(pos, amount));
     }
 
-    private void HandleSpawn(object sender, SpawnEventArgs args)
+    private void HandleSpawnSrroundingArea(object sender, SpawnEventArgs args)
     {
         this.SpawnInSurrondingArea(args.Position);
+    }
+
+    
+    private void HandleSpawn(object sender, SpawnEventArgs args)
+    {
+        this.SpawnObsticals(args.Position);
     }
 
     private void HandleDestroy(object sender, SpawnEventArgs args)
@@ -112,7 +119,6 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
             }
         }
     }
-
 
     private void SetRandomColor(GameObject obj)
     {
