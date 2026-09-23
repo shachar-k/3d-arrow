@@ -4,6 +4,7 @@ using UnityEngine.Pool;
 
 public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSpawnManager>, IObsticleSpawnManager
 {
+    private const int MAX_BLOCK_SIZE = 5;
     #region DataMembers
 
     [SerializeField]
@@ -17,7 +18,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
     #region Properties
     private GameSettings GameSettings { get; set; }
 
-    private IPlaneSpawnManager PlaneSpawnManager {get;set;}
+    private IPlaneSpawnManager PlaneSpawnManager { get; set; }
 
     private ObjectMatrice<List<GameObject>> ObjectsSpawnedPerMatrice { get; set; } = new ObjectMatrice<List<GameObject>>();
 
@@ -31,33 +32,49 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         this.PlaneSpawnManager = this.Container.Resolve<IPlaneSpawnManager>();
         this.objectsToSpawn = new GameObjectPoolList(prefabs);
         SpawnInSurrondingArea(Vector2.zero);
-        this.PlaneSpawnManager.SpawnInSurrowndingArea +=
-         (sender,eventArgs) => this.SpawnInSurrondingArea(eventArgs.Position);
+        this.PlaneSpawnManager.SpawnInSurrowndingArea += this.HandleSpawn;
+        this.PlaneSpawnManager.DestroyPlane += this.HandleDestroy;
     }
 
-     public void SpawnInSurrondingArea(Vector2 pos)
+    void OnDestroy()
+    {
+        this.PlaneSpawnManager.DestroyPlane -= this.HandleDestroy;
+        this.PlaneSpawnManager.SpawnInSurrowndingArea -= this.HandleSpawn;
+    }
+
+    public void SpawnInSurrondingArea(Vector2 pos)
     {
         SpawnObsticals(pos);
         SpawnObsticals(pos + Vector2.down);
         SpawnObsticals(pos + Vector2.left);
         SpawnObsticals(pos + Vector2.right);
-        SpawnObsticals(pos + new Vector2(1,-1));
+        SpawnObsticals(pos + new Vector2(1, -1));
         SpawnObsticals(pos - Vector2.one);
     }
 
     public void SpawnObsticals(Vector2 pos)
     {
         int obstaclePoolPlaneMaxSize = this.GameSettings.ObstaclePoolPlaneMaxSize;
-        var objList =this.ObjectsSpawnedPerMatrice[(int)pos.x, (int)pos.y] ?? new List<GameObject>();
+        var objList = this.ObjectsSpawnedPerMatrice[(int)pos.x, (int)pos.y] ?? new List<GameObject>();
         int maxCanSpawn = obstaclePoolPlaneMaxSize - objList.Count;
-        int amount = Random.Range(this.GameSettings.ObstaclePoolPlaneMinSize,maxCanSpawn);
+        int amount = Random.Range(this.GameSettings.ObstaclePoolPlaneMinSize, maxCanSpawn);
 
-        if(amount <= 0)
+        if (amount <= 0)
         {
             return;
         }
 
-        StartCoroutine(SpawnObsticalsAsync(pos,amount));
+        StartCoroutine(SpawnObsticalsAsync(pos, amount));
+    }
+
+    private void HandleSpawn(object sender, SpawnEventArgs args)
+    {
+        this.SpawnInSurrondingArea(args.Position);
+    }
+
+    private void HandleDestroy(object sender, SpawnEventArgs args)
+    {
+        StartCoroutine(this.DestroyObsticlesInPlaneAsync(args.Position));
     }
 
     private System.Collections.IEnumerator SpawnObsticalsAsync(Vector2 pos, int amount)
@@ -71,7 +88,23 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
             GameObject obj = this.objectsToSpawn.SpawnRandomObject(randomPosition);
             this.UpdatePerPlaneMatrice(pos, obj);
 
-            if(i % 10 ==0)
+            if (i % MAX_BLOCK_SIZE == 0)
+            {
+                yield return new WaitForSeconds(this.GameSettings.CooldownBetweenSpawns);
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator DestroyObsticlesInPlaneAsync(Vector2 pos)
+    {
+        List<GameObject> gameObjects = this.ObjectsSpawnedPerMatrice[(int)pos.x, (int)pos.y];
+
+        for (int i = 0; i < gameObjects.Count; i++)
+        {
+            GameObject gameObject = gameObjects[i];
+            this.objectsToSpawn.Release(gameObject);
+
+            if (i % MAX_BLOCK_SIZE == 0)
             {
                 yield return new WaitForSeconds(this.GameSettings.CooldownBetweenSpawns);
             }
@@ -95,9 +128,10 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
     {
         float x = Random.Range(bounds.min.x, bounds.max.x);
         float z = Random.Range(bounds.min.z, bounds.max.z);
-        float y = bounds.center.y+ 0.5f;
+        float y = bounds.center.y + 0.5f;
 
         return new Vector3(x, y, z);
     }
+
     #endregion
 }

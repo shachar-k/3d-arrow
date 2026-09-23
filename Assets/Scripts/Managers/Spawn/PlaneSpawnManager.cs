@@ -17,7 +17,9 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     [SerializeField]
     public GameObject plane;
 
-    public event EventHandler<SpawnEventArgs> SpawnInSurrowndingArea ;
+    public event EventHandler<SpawnEventArgs> SpawnInSurrowndingArea;
+
+    public event EventHandler<SpawnEventArgs> DestroyPlane;
 
     #endregion
 
@@ -42,7 +44,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     public void SpawnPlanes()
     {
         this.TimeSinceLastSpawn = Time.time;
-       // this.ObsticleSpawnManager.SpawnInSurrondingArea(Vector2.zero);
+        // this.ObsticleSpawnManager.SpawnInSurrondingArea(Vector2.zero);
         this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
         for (int x = -1; x < MAX_PLANES - 1; x++)
         {
@@ -73,7 +75,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
     public Bounds GetPlaneBounds(Vector2 pos)
     {
-        return this.GetBounds(this.PlaneMatrice[(int)pos.x,(int)pos.y]) ?? new Bounds();
+        return this.GetBounds(this.PlaneMatrice[(int)pos.x, (int)pos.y]) ?? new Bounds();
     }
 
     private void CalcAdd(Vector2 posToAdd)
@@ -111,6 +113,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
             for (int y = minY; y <= maxY; y++)
             {
                 this.DeletePlane((int)posToDelete.x, y);
+                this.DestroyPlane.Invoke(this, new SpawnEventArgs(new Vector2((int)posToDelete.x, y)));
             }
         }
 
@@ -121,6 +124,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
             for (int x = minX; x <= maxX; x++)
             {
+                this.DestroyPlane.Invoke(this, new SpawnEventArgs(new Vector2(x, posToDelete.y)));
                 this.DeletePlane(x, (int)posToDelete.y);
             }
         }

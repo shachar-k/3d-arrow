@@ -5,6 +5,7 @@ public interface IPlaneSpawnManager
 {
     #region DataMembers
     public event EventHandler<SpawnEventArgs> SpawnInSurrowndingArea;
+    public event EventHandler<SpawnEventArgs> DestroyPlane;
 
     #endregion
 
