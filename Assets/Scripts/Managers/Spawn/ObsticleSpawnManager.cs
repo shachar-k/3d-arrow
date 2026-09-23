@@ -86,6 +86,8 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         {
             Vector3 randomPosition = GetRandomPositionInBounds(bounds);
             GameObject obj = this.ObjectsToSpawn.SpawnRandomObject(randomPosition);
+            obj.transform.localScale = Vector3.one *Random.Range(1,3); 
+            obj.GetComponent<MeshRenderer>().material.color = Random.ColorHSV();
             this.UpdatePerPlaneMatrice(pos, obj);
 
             if (i % MAX_BLOCK_SIZE == 0)
