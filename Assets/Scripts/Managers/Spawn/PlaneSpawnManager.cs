@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManager>, IPlaneSpawnManager
 {
@@ -15,11 +17,13 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     [SerializeField]
     public GameObject plane;
 
+    public event EventHandler<SpawnEventArgs> SpawnInSurrowndingArea ;
+
     #endregion
 
     #region Properties
 
-    public GameSettings GameSettings => this.Container.Resolve<GameSettings>();
+    private GameSettings GameSettings => this.Container.Resolve<GameSettings>();
 
     private ObjectMatrice<GameObject> PlaneMatrice { get; set; } = new ObjectMatrice<GameObject>();
 
@@ -38,7 +42,8 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     public void SpawnPlanes()
     {
         this.TimeSinceLastSpawn = Time.time;
-
+       // this.ObsticleSpawnManager.SpawnInSurrondingArea(Vector2.zero);
+        this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
         for (int x = -1; x < MAX_PLANES - 1; x++)
         {
             for (int y = 0; y > -MAX_PLANES; y--)
@@ -58,13 +63,12 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
             return;
         }
 
-        Debug.Log($"Collision Detected with: {other.gameObject.name}");
         Bounds bounds = this.GetBounds(other.gameObject) ?? new Bounds();
         Vector2 pos = this.GetGridPosition(other.transform.position, bounds);
         var posToAddAndDelete = this.GetPosToAddAndDelete(pos);
-        Debug.Log($"Pos to Add: {posToAddAndDelete.Item1}, Pos to Delete: {posToAddAndDelete.Item2}");
         this.CalcAdd(posToAddAndDelete.Item1);
         this.CalcDeletion(posToAddAndDelete.Item2);
+        this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(pos));
     }
 
     private void CalcAdd(Vector2 posToAdd)

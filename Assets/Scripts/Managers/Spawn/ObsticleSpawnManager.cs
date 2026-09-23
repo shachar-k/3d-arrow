@@ -7,6 +7,9 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
     #region DataMembers
 
     [SerializeField]
+    private List<ObjectParameters> prefabs;
+
+    [SerializeField]
     private GameObjectPoolList objectsToSpawn;
 
     #endregion
@@ -26,7 +29,10 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         base.Start();
         this.GameSettings = this.Container.Resolve<GameSettings>();
         this.PlaneSpawnManager = this.Container.Resolve<IPlaneSpawnManager>();
-        this.objectsToSpawn = new GameObjectPoolList();
+        this.objectsToSpawn = new GameObjectPoolList(prefabs);
+        SpawnInSurrondingArea(Vector2.zero);
+        this.PlaneSpawnManager.SpawnInSurrowndingArea +=
+         (sender,eventArgs) => this.SpawnInSurrondingArea(eventArgs.Position);
     }
 
      public void SpawnInSurrondingArea(Vector2 pos)

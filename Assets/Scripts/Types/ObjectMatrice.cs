@@ -56,20 +56,6 @@ public class ObjectMatrice<T> where T : class
         }
     }
 
-    private void UpdateBoundsAfterRemoval(int y)
-    {
-        if (y == this.MaxPoint.y)
-        {
-            this.MaxPoint = new Vector2(this.MaxPoint.x, y - 1);
-        }
-        else if (y == this.MinPoint.y)
-        {
-            this.MinPoint = new Vector2(this.MinPoint.x, y + 1);
-        }
-
-        // Debug.Log($"Updated Bounds Removal: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
-    }
-
     private void AddObject(int x, int y, T obj)
     {
         if (!matrice.ContainsKey(x))
@@ -100,7 +86,6 @@ public class ObjectMatrice<T> where T : class
 
         this.MaxPoint = new Vector2(maxX, maxY);
         this.MinPoint = new Vector2(minX, minY);
-        Debug.Log($"Updated Bounds: MaxPoint = {MaxPoint}, MinPoint = {MinPoint}");
     }
     #endregion
 }

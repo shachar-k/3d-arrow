@@ -4,20 +4,22 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Pool;
 
-[System.Serializable]
+
 public class GameObjectPoolList
 {
     #region DataMembers
 
-    [SerializeField]
-    private List<ObjectParameters> prefabs = new List<ObjectParameters>();
+    private List<ObjectParameters> prefabs;
     private Dictionary<int, ObjectPool<GameObject>> poolByUsedObj = new Dictionary<int, ObjectPool<GameObject>>();
 
     #endregion
 
     #region C'Tors
-    public GameObjectPoolList()
+    public GameObjectPoolList( List<ObjectParameters> prefabs)
     {
+        this.prefabs = prefabs;
+        this.Pools = new Dictionary<string, ObjectPool<GameObject>>();
+
         foreach (var prefab in prefabs)
         {
             var pool = new ObjectPool<GameObject>(
@@ -32,6 +34,8 @@ public class GameObjectPoolList
 
             this.Pools.Add(prefab.Name, pool);
         }
+
+        this.PrewarmAll();
     }
 
     #endregion
@@ -97,6 +101,21 @@ public class GameObjectPoolList
     private void OnDestroy(GameObject pooledObj)
     {
         GameObject.Destroy(pooledObj);
+    }
+
+     private void PrewarmAll()
+    {
+        foreach (var pair in this.Pools)
+        {
+            int? max= this.prefabs.FirstOrDefault(prefab => prefab.Name == pair.Key)?.Max;
+            
+            for (int i = 0; i < max; i++)
+            {
+                var pool = pair.Value;
+                var obj = pool.Get();
+                pool.Release(obj);
+            }
+        }
     }
     #endregion
 }
