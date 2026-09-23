@@ -19,7 +19,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
 
     private IPlaneSpawnManager PlaneSpawnManager {get;set;}
 
-    private ObjectMatrice<List<GameObject>> objectsSpawnedPerMatrice { get; set; } = new ObjectMatrice<List<GameObject>>();
+    private ObjectMatrice<List<GameObject>> ObjectsSpawnedPerMatrice { get; set; } = new ObjectMatrice<List<GameObject>>();
 
     #endregion
 
@@ -47,7 +47,16 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
 
     public void SpawnObsticals(Vector2 pos)
     {
-        int amount = Random.Range(this.GameSettings.ObstaclePoolPlaneMinSize, this.GameSettings.ObstaclePoolPlaneMaxSize);
+        int obstaclePoolPlaneMaxSize = this.GameSettings.ObstaclePoolPlaneMaxSize;
+        var objList =this.ObjectsSpawnedPerMatrice[(int)pos.x, (int)pos.y] ?? new List<GameObject>();
+        int maxCanSpawn = obstaclePoolPlaneMaxSize - objList.Count;
+        int amount = Random.Range(this.GameSettings.ObstaclePoolPlaneMinSize,maxCanSpawn);
+
+        if(amount <= 0)
+        {
+            return;
+        }
+
         StartCoroutine(SpawnObsticalsAsync(pos,amount));
     }
 
@@ -71,7 +80,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
 
     private void UpdatePerPlaneMatrice(Vector2 pos, GameObject obj)
     {
-        var list = this.objectsSpawnedPerMatrice[(int)pos.x, (int)pos.y];
+        var list = this.ObjectsSpawnedPerMatrice[(int)pos.x, (int)pos.y];
 
         if (list == null)
         {
@@ -79,7 +88,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         }
 
         list.Add(obj);
-        this.objectsSpawnedPerMatrice[(int)pos.x, (int)pos.y] = list;
+        this.ObjectsSpawnedPerMatrice[(int)pos.x, (int)pos.y] = list;
     }
 
     private Vector3 GetRandomPositionInBounds(Bounds bounds)
