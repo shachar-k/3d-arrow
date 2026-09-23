@@ -95,7 +95,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
     {
         float x = Random.Range(bounds.min.x, bounds.max.x);
         float z = Random.Range(bounds.min.z, bounds.max.z);
-        float y = bounds.center.y;
+        float y = bounds.center.y+ 0.5f;
 
         return new Vector3(x, y, z);
     }
