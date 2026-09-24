@@ -52,6 +52,16 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         {
             this.GameManager.SpawnPlaneByCollison(other);
         }
+        else if(other.tag == Consts.ObsticalTag)
+        {
+            this.gameObject.SetActive(false);
+            this.GameManager.GameOver();
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("collison entered");
     }
 
     void FixedUpdate()

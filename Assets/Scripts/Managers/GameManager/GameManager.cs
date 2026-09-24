@@ -27,6 +27,16 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         return Status == eGameStatus.Running;
     }
 
+    public void SpawnPlaneByCollison(Collider other)
+    {
+        this.PlaneSpawnManager.SpawnPlaneByCollison(other);
+    }
+
+    public void GameOver()
+    {
+        this.Status = eGameStatus.GameOver;
+    }
+
     protected override void Start()
     {
         base.Start();
@@ -45,12 +55,6 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.Status = eGameStatus.Running;
         this.PlaneSpawnManager.SpawnPlanes();
     }
-
-    public void SpawnPlaneByCollison(Collider other)
-    {
-        this.PlaneSpawnManager.SpawnPlaneByCollison(other);
-    }
-
 
     #endregion
 }

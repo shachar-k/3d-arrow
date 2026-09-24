@@ -435,6 +435,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Sphere
       objectReference: {fileID: 0}
+    - target: {fileID: 5529610271627634703, guid: df30c2e65fd4e7046b3fbb8bcfc2c826, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5529610271627634703, guid: df30c2e65fd4e7046b3fbb8bcfc2c826, type: 3}
+      propertyPath: m_ProvidesContacts
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -448,6 +456,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2379541442575871477, guid: cac84ebc230232f408dedf76dab99c7f, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2379541442575871477, guid: cac84ebc230232f408dedf76dab99c7f, type: 3}
+      propertyPath: m_ProvidesContacts
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2482631384213086878, guid: cac84ebc230232f408dedf76dab99c7f, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -562,6 +578,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 150830977708438977, guid: 1e6a383158f0a214795bad9efc0450aa, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 150830977708438977, guid: 1e6a383158f0a214795bad9efc0450aa, type: 3}
+      propertyPath: m_ProvidesContacts
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 435303697271601992, guid: 1e6a383158f0a214795bad9efc0450aa, type: 3}
       propertyPath: m_Name
       value: Cylinder
