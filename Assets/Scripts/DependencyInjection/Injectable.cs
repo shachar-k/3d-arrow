@@ -1,5 +1,10 @@
 using UnityEngine;
 
+/// <summary>
+/// the singletons that have depnedencies
+/// </summary>
+/// <typeparam name="T"></typeparam>
+/// <typeparam name="I"></typeparam>
 public class Injectable<T, I>: MonoBehaviour 
     where T : MonoBehaviour 
     where I : class

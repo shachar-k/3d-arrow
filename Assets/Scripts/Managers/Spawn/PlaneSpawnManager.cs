@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManager>, IPlaneSpawnManager
 {
@@ -15,13 +17,21 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     [SerializeField]
     public GameObject plane;
 
+    public event EventHandler<SpawnEventArgs> SpawnInSurrowndingArea;
+
+    public event EventHandler<SpawnEventArgs> DestroyPlane;
+
+    public event EventHandler<SpawnEventArgs> SpawnInPosition;
+
     #endregion
 
     #region Properties
 
-    public GameSettings GameSettings => this.Container.Resolve<GameSettings>();
+    private GameSettings GameSettings => this.Container.Resolve<GameSettings>();
 
-    private ObjectPoolMatrice<GameObject> PlaneMatrice { get; set; } = new ObjectPoolMatrice<GameObject>();
+    private ObjectMatrice<GameObject> PlaneMatrice { get; set; } = new ObjectMatrice<GameObject>();
+
+    private GameObjectPoolList ObjectsToSpawn {get;set;}
 
     private float TimeSinceLastSpawn { get; set; } = 0f;
 
@@ -32,19 +42,25 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     protected override void Start()
     {
         base.Start();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        this.ObjectsToSpawn = new GameObjectPoolList(new System.Collections.Generic.List<ObjectParameters>()
+        {
+            new ObjectParameters
+            {
+                Prefab = this.plane,
+                Defualt = MAX_PLANES,
+                Max = MAX_PLANES,
+                Name = Consts.PlaneTag
+            }
+        });
     }
 
 
     public void SpawnPlanes()
     {
         this.TimeSinceLastSpawn = Time.time;
-
+        this.SpawnInPosition?.Invoke(this, new SpawnEventArgs(Vector2.zero));
+        this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
+        
         for (int x = -1; x < MAX_PLANES - 1; x++)
         {
             for (int y = 0; y > -MAX_PLANES; y--)
@@ -64,13 +80,17 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
             return;
         }
 
-        Debug.Log($"Collision Detected with: {other.gameObject.name}");
         Bounds bounds = this.GetBounds(other.gameObject) ?? new Bounds();
         Vector2 pos = this.GetGridPosition(other.transform.position, bounds);
         var posToAddAndDelete = this.GetPosToAddAndDelete(pos);
-        Debug.Log($"Pos to Add: {posToAddAndDelete.Item1}, Pos to Delete: {posToAddAndDelete.Item2}");
         this.CalcAdd(posToAddAndDelete.Item1);
         this.CalcDeletion(posToAddAndDelete.Item2);
+        this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(pos));
+    }
+
+    public Bounds GetPlaneBounds(Vector2 pos)
+    {
+        return this.GetBounds(this.PlaneMatrice[(int)pos.x, (int)pos.y]) ?? new Bounds();
     }
 
     private void CalcAdd(Vector2 posToAdd)
@@ -108,6 +128,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
             for (int y = minY; y <= maxY; y++)
             {
                 this.DeletePlane((int)posToDelete.x, y);
+                this.DestroyPlane.Invoke(this, new SpawnEventArgs(new Vector2((int)posToDelete.x, y)));
             }
         }
 
@@ -118,6 +139,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
             for (int x = minX; x <= maxX; x++)
             {
+                this.DestroyPlane.Invoke(this, new SpawnEventArgs(new Vector2(x, posToDelete.y)));
                 this.DeletePlane(x, (int)posToDelete.y);
             }
         }
@@ -130,23 +152,23 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
         Vector2 posToAdd = new Vector2(DONT_DELETE, DONT_DELETE);
         Vector2 posToDelete = new Vector2(DONT_DELETE, DONT_DELETE);
 
-        if (pos.x >= max.x)
+        if (Math.Round(pos.x) >= Math.Round(max.x))
         {
             posToAdd.x = max.x + 1;
             posToDelete.x = min.x;
         }
-        else if (pos.x <= min.x)
+        else if (Math.Round(pos.x) <= Math.Round(min.x))
         {
             posToAdd.x = min.x - 1;
             posToDelete.x = max.x;
         }
 
-        if (pos.y >= max.y)
+        if (Math.Round(pos.y) >= Math.Round(max.y))
         {
             posToAdd.y = max.y + 1;
             posToDelete.y = min.y;
         }
-        else if (pos.y <= min.y)
+        else if (Math.Round(pos.y) <= Math.Round(min.y))
         {
             posToAdd.y = min.y - 1;
             posToDelete.y = max.y;
@@ -158,7 +180,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
     private void AddPlane(int x, int y)
     {
-        var obj = Instantiate(this.plane, this.GameSettings.PlaneStartLocation, Quaternion.identity);
+        var obj = this.ObjectsToSpawn.SpawnObject(Consts.PlaneTag, this.GameSettings.PlaneStartLocation);
         obj.transform.position = this.GetNewPosOfGrid(x, y, obj);
         obj.transform.parent = this.transform;
         this.PlaneMatrice[x, y] = obj;
@@ -167,11 +189,11 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     private void DeletePlane(int x, int y)
     {
         var obj = this.PlaneMatrice[x, y];
+
         if (obj != null)
         {
             this.PlaneMatrice[x, y] = null;
-            Destroy(obj);
-
+            this.ObjectsToSpawn.Release(obj);
         }
     }
 

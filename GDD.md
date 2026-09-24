@@ -86,9 +86,10 @@ stateDiagram-v2
 | `spawnInterval` | Time between obstacle spawns — the second difficulty dial alongside speed | 0.6 s |
 | `maxDistanceForward` | Far edge of the spawn plane ahead of the player — together with `scrollSpeed` this sets how much warning the player gets | 30 u |
 | `maxDistanceLeftRight` | Half-width of the spawn plane — how far left/right a shape can appear from the player's forward line | 8 u |
-| `obstaclePoolSize` | How many shape instances exist at once, recycled | 24 |
-| `obstaclePoolMinScale` | min scale for obsticales | 24 |
-| `obstaclePoolMaxScale` | max scale for obsticales | 24 |
+| `obstaclePoolPlaneMinSize` | How many shape instances exist at once, recycled, per plane | 7 |
+| `obstaclePoolPlaneMaxSize` | How many shape instances exist at once, recycled, per plane | 11 |
+| `obstaclePoolMinScale` | min scale for obsticales | 10 |
+| `obstaclePoolMaxScale` | max scale for obsticales | 30 |
 
 **Where these live:** a `GameConfig` ScriptableObject referenced by `PlayerController`, `GameController` and `Spawner`, so none of the above requires a recompile to change.
 

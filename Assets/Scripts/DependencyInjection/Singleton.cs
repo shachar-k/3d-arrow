@@ -1,5 +1,10 @@
 using UnityEngine;
 
+
+/// <summary>
+/// for generic classes that dont have dependencies 
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T _instance;

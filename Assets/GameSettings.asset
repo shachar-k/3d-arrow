@@ -12,8 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 15f32e9ed9fc67b4f93d10482a526a06, type: 3}
   m_Name: GameSettings
   m_EditorClassIdentifier: Assembly-CSharp::GameSettings
-  Movespeed: 0.3
+  MoveSpeedDiff: 1.5
   TurnAngle: 30
   TurnRate: 0.25
   PlaneStartLocation: {x: 0, y: -0.27, z: 0}
   BaseSpeed: 4
+  RampSpeed: 1.5
+  MaxRamp: 6
+  RampFixedMinutes: 0.3
+  ObstaclePoolPlaneMinSize: 0
+  ObstaclePoolPlaneMaxSize: 11
+  CooldownBetweenSpawns: 0.1
