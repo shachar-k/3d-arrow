@@ -94,8 +94,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
             int scale = Random.Range(1, this.GameSettings.MaxSizeOfObject);
             Vector3 randomPosition = this.GetRandomPositionInBounds(bounds, scale);
             GameObject obj = this.ObjectsToSpawn.SpawnRandomObject(randomPosition);
-            obj.transform.localScale = Vector3.one * scale;
-            SetRandomColor(obj);
+            this.InitializeObsticle(scale, obj);
             this.UpdatePerPlaneMatrice(pos, obj);
 
             if (i % MAX_BLOCK_SIZE == 0)
@@ -104,6 +103,7 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
             }
         }
     }
+
 
     private System.Collections.IEnumerator DestroyObsticlesInPlaneAsync(Vector2 pos)
     {
@@ -158,5 +158,12 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         return new Vector3(x, y, z);
     }
 
+    private void InitializeObsticle(int scale, GameObject obj)
+    {
+        obj.transform.localScale = Vector3.one * scale;
+        var parent = GameObject.FindWithTag(Consts.ObsticalStorageTag);
+        obj.transform.parent = parent.transform;
+        SetRandomColor(obj);
+    }
     #endregion
 }
