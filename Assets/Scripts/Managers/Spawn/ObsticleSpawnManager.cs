@@ -104,7 +104,6 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         }
     }
 
-
     private System.Collections.IEnumerator DestroyObsticlesInPlaneAsync(Vector2 pos)
     {
         List<GameObject> gameObjects = this.ObjectsSpawnedPerMatrice[(int)pos.x, (int)pos.y] ?? new List<GameObject>();

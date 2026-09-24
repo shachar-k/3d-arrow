@@ -2,8 +2,14 @@ using UnityEngine;
 
 public class PlayerController : Injectable<PlayerController, IPlayerContoller>, IPlayerContoller
 {
+    #region Consts
     private const int NO_VALUE = -999;
+
+    #endregion 
+
     #region DataMembers
+    [SerializeField]
+    private float _particleAnimationTime = 0.8f;
     private Quaternion _defualtRotation;
     private Vector3 _cameraDistance;
     private Quaternion _cameraRotationOffset = Quaternion.Euler(0f, 180f, 0f);
@@ -21,11 +27,15 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
     private IGameManager GameManager { get; set; }
 
+    private ParticleSystem ParticleSystem { get; set; }
+
     private float TimeSinceRamp { get; set; } = NO_VALUE;
 
     private int RampCount { get; set; } = 1;
 
     #endregion
+
+    #region Methods
 
     protected override void Start()
     {
@@ -36,34 +46,6 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         this._cameraDistance = this.MainCamera.transform.position - this.transform.position;
     }
 
-    private void InitializeProperties()
-    {
-        this.InputManager = this.Container.Resolve<IInputManager>();
-        this.GameSettings = this.Container.Resolve<GameSettings>();
-        this.GameManager = this.Container.Resolve<IGameManager>();
-        this.Rigidbody = this.GetComponent<Rigidbody>();
-        this.MainCamera = Camera.main;
-    }
-
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.tag == Consts.PlaneTag)
-        {
-            this.GameManager.SpawnPlaneByCollison(other);
-        }
-        else if(other.tag == Consts.ObsticalTag)
-        {
-            this.gameObject.SetActive(false);
-            this.GameManager.GameOver();
-        }
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        Debug.Log("collison entered");
-    }
-
     void FixedUpdate()
     {
         if (!this.GameManager.IsGameRunning())
@@ -71,11 +53,16 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
             return;
         }
 
+        if (!this.isActiveAndEnabled)
+        {
+            this.gameObject.SetActive(true);
+        }
+
         this.CalcRamp();
 
-        float speed = this.GameSettings.BaseSpeed * Time.fixedDeltaTime *this.RampCount * this.GameSettings.RampSpeed;
+        float speed = this.GameSettings.BaseSpeed * Time.fixedDeltaTime * this.RampCount * this.GameSettings.RampSpeed;
         Vector3 newpos = this.transform.position + Vector3.back * speed;
-        var direction = this.InputManager.GetInputValue<float>(eInput.playerMoveInput);
+        float direction = this.InputManager.GetInputValue<float>(eInput.playerMoveInput);
 
         if (direction != 0)
         {
@@ -91,19 +78,6 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         this.Rigidbody.MovePosition(newpos);
     }
 
-    private void CalcRamp()
-    {
-        if (this.TimeSinceRamp == NO_VALUE)
-        {
-            this.TimeSinceRamp = Time.time;
-        }
-        else if (Time.time - this.TimeSinceRamp >= this.GameSettings.RampFixedMinutes * 60 && this.RampCount <= this.GameSettings.MaxRamp)
-        {
-            this.RampCount++;
-            this.TimeSinceRamp = Time.time;
-        }
-    }
-
     void LateUpdate()
     {
         if (!this.GameManager.IsGameRunning())
@@ -117,4 +91,55 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         Quaternion targetRotation = this._cameraRotationOffset * playerTilt;
         this.MainCamera.transform.rotation = Quaternion.Slerp(this.MainCamera.transform.rotation, targetRotation, this.GameSettings.TurnRate);
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == Consts.PlaneTag)
+        {
+            this.GameManager.SpawnPlaneByCollison(other);
+        }
+        else if (other.tag == Consts.ObsticalTag)
+        {
+            this.GetComponent<MeshRenderer>().enabled = false;
+            StartCoroutine(this.PlayParticalsAsync());
+            this.GameManager.GameOver();
+        }
+    }
+
+    private System.Collections.IEnumerator PlayParticalsAsync()
+    {
+        this.ParticleSystem.gameObject.SetActive(true);
+        this.ParticleSystem.Clear();
+        this.ParticleSystem.Play();
+        yield return new WaitForSeconds(this._particleAnimationTime);
+        this.ParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        this.ParticleSystem.gameObject.SetActive(false);
+        this.gameObject.SetActive(false);
+    }
+
+    private void CalcRamp()
+    {
+        if (this.TimeSinceRamp == NO_VALUE)
+        {
+            this.TimeSinceRamp = Time.time;
+        }
+        else if (Time.time - this.TimeSinceRamp >= this.GameSettings.RampFixedMinutes * 60 && this.RampCount <= this.GameSettings.MaxRamp)
+        {
+            this.RampCount++;
+            this.TimeSinceRamp = Time.time;
+        }
+    }
+
+    private void InitializeProperties()
+    {
+        this.InputManager = this.Container.Resolve<IInputManager>();
+        this.GameSettings = this.Container.Resolve<GameSettings>();
+        this.GameManager = this.Container.Resolve<IGameManager>();
+        this.Rigidbody = this.GetComponent<Rigidbody>();
+        this.ParticleSystem = this.GetComponentInChildren<ParticleSystem>();
+        this.MainCamera = Camera.main;
+        this.ParticleSystem.gameObject.SetActive(false);
+    }
+
+    #endregion
 }
