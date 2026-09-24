@@ -152,23 +152,23 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
         Vector2 posToAdd = new Vector2(DONT_DELETE, DONT_DELETE);
         Vector2 posToDelete = new Vector2(DONT_DELETE, DONT_DELETE);
 
-        if (pos.x >= max.x)
+        if (Math.Round(pos.x) >= Math.Round(max.x))
         {
             posToAdd.x = max.x + 1;
             posToDelete.x = min.x;
         }
-        else if (pos.x <= min.x)
+        else if (Math.Round(pos.x) <= Math.Round(min.x))
         {
             posToAdd.x = min.x - 1;
             posToDelete.x = max.x;
         }
 
-        if (pos.y >= max.y)
+        if (Math.Round(pos.y) >= Math.Round(max.y))
         {
             posToAdd.y = max.y + 1;
             posToDelete.y = min.y;
         }
-        else if (pos.y <= min.y)
+        else if (Math.Round(pos.y) <= Math.Round(min.y))
         {
             posToAdd.y = min.y - 1;
             posToDelete.y = max.y;
