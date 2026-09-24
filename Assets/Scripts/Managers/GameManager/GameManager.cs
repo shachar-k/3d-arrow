@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
@@ -15,6 +16,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     public GameSettings GameSettings => this._gameSettings;
 
     private eGameStatus Status { get; set; }
+
+    private TextMeshPro GameOverText { get; set; }
 
     private IPlaneSpawnManager PlaneSpawnManager => this.Container.Resolve<IPlaneSpawnManager>();
 
@@ -37,10 +40,16 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.Status = eGameStatus.GameOver;
     }
 
+    public void ToMenu()
+    {
+        this.Status = eGameStatus.Menu;
+    }
+
     protected override void Start()
     {
         base.Start();
         this.Container.RegisterScriptable(this._gameSettings);
+        this.GameOverText = GameObject.fi
         this.InitGame();
     }
 

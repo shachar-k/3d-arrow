@@ -8,5 +8,7 @@ public interface IGameManager
     public void SpawnPlaneByCollison(Collider other);
 
     public void GameOver();
+
+    public void ToMenu();
     #endregion
 }
