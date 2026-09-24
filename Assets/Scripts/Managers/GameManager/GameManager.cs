@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 {
+    private const int SECONDS_GAME_OVER_TEXT_DISPLAYED = 3;
     #region DataMembers
 
     [SerializeField]
@@ -17,9 +18,9 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private eGameStatus Status { get; set; }
 
-    private TextMeshPro GameOverText { get; set; }
-
     private IPlaneSpawnManager PlaneSpawnManager => this.Container.Resolve<IPlaneSpawnManager>();
+
+    private IUIManager UIManager => this.Container.Resolve<IUIManager>();
 
     #endregion
 
@@ -43,13 +44,13 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     public void ToMenu()
     {
         this.Status = eGameStatus.Menu;
+        this.StartCoroutine(this.DisplayGameOverScreen());
     }
 
     protected override void Start()
     {
         base.Start();
         this.Container.RegisterScriptable(this._gameSettings);
-        this.GameOverText = GameObject.fi
         this.InitGame();
     }
 
@@ -57,6 +58,13 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     void Update()
     {
 
+    }
+
+    private System.Collections.IEnumerator DisplayGameOverScreen()
+    {
+        
+        yield return new WaitForSeconds(SECONDS_GAME_OVER_TEXT_DISPLAYED);
+        this.ToMenu();
     }
 
     private void InitGame()
