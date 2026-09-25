@@ -5,7 +5,7 @@ public interface IUIManager
     #region Methods
 
     public void Init();
-    public void DisplayGameOverScreen();
+    public System.Collections.IEnumerator DisplayGameOverScreen();
     
     #endregion
 }

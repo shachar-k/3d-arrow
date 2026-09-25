@@ -101,8 +101,8 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         else if (other.tag == Consts.ObsticalTag)
         {
             this.GetComponent<MeshRenderer>().enabled = false;
-            StartCoroutine(this.PlayParticalsAsync());
             this.GameManager.GameOver();
+            StartCoroutine(this.PlayParticalsAsync());
         }
     }
 
@@ -114,6 +114,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         yield return new WaitForSeconds(this._particleAnimationTime);
         this.ParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         this.ParticleSystem.gameObject.SetActive(false);
+        this.GameManager.GameOverScreen();
         this.gameObject.SetActive(false);
     }
 

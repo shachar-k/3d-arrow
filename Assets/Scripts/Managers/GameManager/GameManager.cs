@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 {
-    private const int SECONDS_GAME_OVER_TEXT_DISPLAYED = 3;
     #region DataMembers
 
     [SerializeField]
@@ -20,7 +19,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private IPlaneSpawnManager PlaneSpawnManager => this.Container.Resolve<IPlaneSpawnManager>();
 
-    private IUIManager UIManager => this.Container.Resolve<IUIManager>();
+    private IUIManager UIManager => this.Container.Resolve<IUIManager>() ?? this.GetComponentInChildren<UIManager>();
 
     #endregion
 
@@ -44,9 +43,13 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     public void ToMenu()
     {
         this.Status = eGameStatus.Menu;
-        this.StartCoroutine(this.DisplayGameOverScreen());
     }
 
+    public void GameOverScreen()
+    {
+        this.StartCoroutine(this.UIManager.DisplayGameOverScreen());
+    }
+   
     protected override void Start()
     {
         base.Start();
@@ -58,13 +61,6 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     void Update()
     {
 
-    }
-
-    private System.Collections.IEnumerator DisplayGameOverScreen()
-    {
-        
-        yield return new WaitForSeconds(SECONDS_GAME_OVER_TEXT_DISPLAYED);
-        this.ToMenu();
     }
 
     private void InitGame()

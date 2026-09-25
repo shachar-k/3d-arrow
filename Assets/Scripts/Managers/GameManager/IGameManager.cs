@@ -10,5 +10,7 @@ public interface IGameManager
     public void GameOver();
 
     public void ToMenu();
+
+    public void GameOverScreen();
     #endregion
 }
