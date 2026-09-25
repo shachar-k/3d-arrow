@@ -23,6 +23,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private IUIManager UIManager => this.Container.Resolve<IUIManager>() ?? this.GetComponentInChildren<UIManager>();
 
+    private Camera MainCamera => Camera.main;
+
     #endregion
 
     #region Methods
@@ -44,7 +46,14 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     public void GameOverScreen()
     {
-        this.StartCoroutine(this.UIManager.DisplayGameOverScreen());
+        this.StartCoroutine(this.GameOverScreenAsync());
+    }
+
+        public void InitGame()
+    {
+        this.Status = eGameStatus.Running;
+        this.PlaneSpawnManager.SpawnPlanes(true);
+        this.Container.Resolve<IPlayerContoller>().Activate();
     }
 
     protected override void Start()
@@ -54,11 +63,13 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.Status = eGameStatus.Menu;
     }
 
-    public void InitGame()
+    private System.Collections.IEnumerator GameOverScreenAsync()
     {
-        this.Status = eGameStatus.Running;
-        this.PlaneSpawnManager.SpawnPlanes(true);
-        this.Container.Resolve<IPlayerContoller>().Activate();
+        yield return this.UIManager.DisplayGameOverScreen();
+        this.PlaneSpawnManager.Clear();
+        this.ObsticleSpawnManager.Clear();
+        this.MainCamera.transform.position = Vector2.zero;
+        this.PlaneSpawnManager.SpawnPlanes();
     }
 
     #endregion

@@ -67,6 +67,12 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         StartCoroutine(SpawnObsticalsAsync(pos, amount));
     }
 
+    public void Clear()
+    {
+        this.ObjectsSpawnedPerMatrice.Clear();
+        this.ObjectsToSpawn.Clear();
+    }
+
     private void HandleSpawnSrroundingArea(object sender, SpawnEventArgs args)
     {
         this.SpawnInSurrondingArea(args.Position);
@@ -163,5 +169,6 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         obj.transform.parent = parent.transform;
         SetRandomColor(obj);
     }
+
     #endregion
 }

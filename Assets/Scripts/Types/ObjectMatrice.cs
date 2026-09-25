@@ -31,6 +31,11 @@ public class ObjectMatrice<T> where T : class
         }
     }
 
+    public void Clear()
+    {
+        this.matrice.Clear();
+    }
+
     private T GetObject(int x, int y)
     {
         if (!matrice.ContainsKey(x) || !matrice[x].ContainsKey(y))

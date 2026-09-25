@@ -5794,6 +5794,7 @@ MonoBehaviour:
   _gameOverTextPrefab: {fileID: 1983871479}
   _menuStuff:
   - {fileID: 233000795}
+  - {fileID: 975396268}
 --- !u!1 &1538190851
 GameObject:
   m_ObjectHideFlags: 0

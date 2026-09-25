@@ -100,6 +100,11 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
     void OnTriggerEnter(Collider other)
     {
+        if(TimeSinceRamp < 0.1)
+        {
+            return;
+        }
+
         if (other.tag == Consts.PlaneTag)
         {
             this.GameManager.SpawnPlaneByCollison(other);

@@ -15,5 +15,6 @@ public interface IPlaneSpawnManager
     public void SpawnPlanes(bool spawnObsticles = false);
     public void SpawnPlaneByCollison(Collider other);
     public Bounds GetPlaneBounds(Vector2 pos);
+    public void Clear();
     #endregion
 }

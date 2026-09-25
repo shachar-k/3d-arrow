@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -38,21 +39,6 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     #endregion
 
     #region Methods
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    protected override void Start()
-    {
-        base.Start();
-        this.ObjectsToSpawn = new GameObjectPoolList(new System.Collections.Generic.List<ObjectParameters>()
-        {
-            new ObjectParameters
-            {
-                Prefab = this.plane,
-                Defualt = MAX_PLANES,
-                Max = MAX_PLANES,
-                Name = Consts.PlaneTag
-            }
-        });
-    }
 
 
     public void SpawnPlanes(bool spawnObsticles = false)
@@ -95,6 +81,42 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     public Bounds GetPlaneBounds(Vector2 pos)
     {
         return this.GetBounds(this.PlaneMatrice[(int)pos.x, (int)pos.y]) ?? new Bounds();
+    }
+
+
+    public void Clear()
+    {
+        Vector2 maxPoint = this.PlaneMatrice.MaxPoint;
+        Vector2 minPoint = this.PlaneMatrice.MinPoint;
+        
+        for (int x = (int)Math.Round(minPoint.x); x<= (int)Math.Round(maxPoint.x); x++)
+        {
+            for(int  y=(int)Math.Round(minPoint.y); y<= (int)Math.Round(maxPoint.y);y++)
+            {
+                this.DeletePlane(x, y);
+                this.DestroyPlane.Invoke(this, new SpawnEventArgs(new Vector2(x, y)));
+ 
+            }
+        }
+
+        this.PlaneMatrice.Clear();
+       // this.ObjectsToSpawn.Clear();
+    }
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    protected override void Start()
+    {
+        base.Start();
+        this.ObjectsToSpawn = new GameObjectPoolList(new System.Collections.Generic.List<ObjectParameters>()
+        {
+            new ObjectParameters
+            {
+                Prefab = this.plane,
+                Defualt = MAX_PLANES,
+                Max = MAX_PLANES,
+                Name = Consts.PlaneTag
+            }
+        });
     }
 
     private void CalcAdd(Vector2 posToAdd)
