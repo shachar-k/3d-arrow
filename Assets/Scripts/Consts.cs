@@ -6,4 +6,5 @@ public static class Consts
     public const string ObsticalStorageTag = "ObsticalStorage";
     public const string ObsticalTag = "Obsticle";
     public const string GameOverTextTag = "GameOverText";
+    public const string PlayerTag ="Player"; 
 }

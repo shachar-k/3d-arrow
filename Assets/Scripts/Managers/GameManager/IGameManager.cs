@@ -7,10 +7,10 @@ public interface IGameManager
 
     public void SpawnPlaneByCollison(Collider other);
 
-    public void GameOver();
-
-    public void ToMenu();
+    public void SetStatus(eGameStatus status);
 
     public void GameOverScreen();
+
+    public void InitGame();
     #endregion
 }

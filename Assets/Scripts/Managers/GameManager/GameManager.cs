@@ -19,6 +19,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private IPlaneSpawnManager PlaneSpawnManager => this.Container.Resolve<IPlaneSpawnManager>();
 
+    private IObsticleSpawnManager ObsticleSpawnManager => this.Container.Resolve<IObsticleSpawnManager>();
+
     private IUIManager UIManager => this.Container.Resolve<IUIManager>() ?? this.GetComponentInChildren<UIManager>();
 
     #endregion
@@ -35,38 +37,28 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.PlaneSpawnManager.SpawnPlaneByCollison(other);
     }
 
-    public void GameOver()
+    public void SetStatus(eGameStatus status)
     {
-        this.Status = eGameStatus.GameOver;
-    }
-
-    public void ToMenu()
-    {
-        this.Status = eGameStatus.Menu;
+        this.Status =status;
     }
 
     public void GameOverScreen()
     {
         this.StartCoroutine(this.UIManager.DisplayGameOverScreen());
     }
-   
+
     protected override void Start()
     {
         base.Start();
         this.Container.RegisterScriptable(this._gameSettings);
-        this.InitGame();
+        this.Status = eGameStatus.Menu;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    private void InitGame()
+    public void InitGame()
     {
         this.Status = eGameStatus.Running;
-        this.PlaneSpawnManager.SpawnPlanes();
+        this.PlaneSpawnManager.SpawnPlanes(true);
+        this.Container.Resolve<IPlayerContoller>().Activate();
     }
 
     #endregion

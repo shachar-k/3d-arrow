@@ -31,7 +31,6 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         this.GameSettings = this.Container.Resolve<GameSettings>();
         this.PlaneSpawnManager = this.Container.Resolve<IPlaneSpawnManager>();
         this.ObjectsToSpawn = new GameObjectPoolList(prefabs);
-        SpawnInSurrondingArea(Vector2.zero);
         this.PlaneSpawnManager.SpawnInSurrowndingArea += this.HandleSpawnSrroundingArea;
         this.PlaneSpawnManager.SpawnInPosition += this.HandleSpawn;
         this.PlaneSpawnManager.DestroyPlane += this.HandleDestroy;

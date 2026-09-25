@@ -31,7 +31,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
     private ObjectMatrice<GameObject> PlaneMatrice { get; set; } = new ObjectMatrice<GameObject>();
 
-    private GameObjectPoolList ObjectsToSpawn {get;set;}
+    private GameObjectPoolList ObjectsToSpawn { get; set; }
 
     private float TimeSinceLastSpawn { get; set; } = 0f;
 
@@ -55,12 +55,16 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     }
 
 
-    public void SpawnPlanes()
+    public void SpawnPlanes(bool spawnObsticles = false)
     {
         this.TimeSinceLastSpawn = Time.time;
-        this.SpawnInPosition?.Invoke(this, new SpawnEventArgs(Vector2.zero));
-        this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
-        
+
+        if (spawnObsticles)
+        {
+            this.SpawnInPosition?.Invoke(this, new SpawnEventArgs(Vector2.zero));
+            this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
+        }
+
         for (int x = -1; x < MAX_PLANES - 1; x++)
         {
             for (int y = 0; y > -MAX_PLANES; y--)

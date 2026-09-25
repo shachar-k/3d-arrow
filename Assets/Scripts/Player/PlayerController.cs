@@ -37,6 +37,11 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
     #region Methods
 
+    public void Activate()
+    {
+        this.gameObject.SetActive(true);
+    }
+
     protected override void Start()
     {
         base.Start();
@@ -44,6 +49,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         this._defualtRotation = this.transform.rotation;
         this.MainCamera.transform.rotation = this._cameraRotationOffset;
         this._cameraDistance = this.MainCamera.transform.position - this.transform.position;
+        this.gameObject.SetActive(false);
     }
 
     void FixedUpdate()
@@ -101,7 +107,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         else if (other.tag == Consts.ObsticalTag)
         {
             this.GetComponent<MeshRenderer>().enabled = false;
-            this.GameManager.GameOver();
+            this.GameManager.SetStatus(eGameStatus.GameOver);
             StartCoroutine(this.PlayParticalsAsync());
         }
     }
@@ -115,6 +121,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         this.ParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         this.ParticleSystem.gameObject.SetActive(false);
         this.GameManager.GameOverScreen();
+        yield return null;
         this.gameObject.SetActive(false);
     }
 
