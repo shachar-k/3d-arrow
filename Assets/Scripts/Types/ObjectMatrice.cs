@@ -84,6 +84,12 @@ public class ObjectMatrice<T> where T : class
 
     private void UpdateBounds()
     {
+        if(this.matrice.Count <= 0)
+        {
+            this.MinPoint = this.MaxPoint = Vector2.zero;
+            return;
+        }
+
         int maxX = this.matrice.Keys.Max();
         int minX = this.matrice.Keys.Min();
         int maxY = this.matrice.Values.SelectMany(v => v.Keys).Max();

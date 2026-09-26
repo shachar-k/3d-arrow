@@ -40,6 +40,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
     public void Activate()
     {
         this.gameObject.SetActive(true);
+        this.GetComponent<MeshRenderer>().enabled = true;
     }
 
     protected override void Start()
@@ -100,7 +101,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
     void OnTriggerEnter(Collider other)
     {
-        if(TimeSinceRamp < 0.1)
+        if (TimeSinceRamp < 0.1)
         {
             return;
         }

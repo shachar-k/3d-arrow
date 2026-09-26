@@ -49,7 +49,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.StartCoroutine(this.GameOverScreenAsync());
     }
 
-        public void InitGame()
+    public void InitGame()
     {
         this.Status = eGameStatus.Running;
         this.PlaneSpawnManager.SpawnPlanes(true);

@@ -45,11 +45,7 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     {
         this.TimeSinceLastSpawn = Time.time;
 
-        if (spawnObsticles)
-        {
-            this.SpawnInPosition?.Invoke(this, new SpawnEventArgs(Vector2.zero));
-            this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
-        }
+      
 
         for (int x = -1; x < MAX_PLANES - 1; x++)
         {
@@ -60,6 +56,12 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
                     this.AddPlane(x, y);
                 }
             }
+        }
+        
+        if (spawnObsticles)
+        {
+            this.SpawnInPosition?.Invoke(this, new SpawnEventArgs(Vector2.zero));
+            this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
         }
     }
 
