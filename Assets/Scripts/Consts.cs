@@ -5,4 +5,8 @@ public static class Consts
     public const string PlaneTag = "Plane";
     public const string ObsticalStorageTag = "ObsticalStorage";
     public const string ObsticalTag = "Obsticle";
+    public const string HighScorePropName = "HighScore";
+    public const string ScoreTextTag ="ScoreText";
+    public const string HighScoreTextTag ="HighScoreText";
+
 }

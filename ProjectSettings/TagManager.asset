@@ -7,6 +7,9 @@ TagManager:
   - Plane
   - Obsticle
   - ObsticalStorage
+  - GameOverText
+  - ScoreText
+  - HighScoreText
   layers:
   - Default
   - TransparentFX

@@ -31,7 +31,6 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         this.GameSettings = this.Container.Resolve<GameSettings>();
         this.PlaneSpawnManager = this.Container.Resolve<IPlaneSpawnManager>();
         this.ObjectsToSpawn = new GameObjectPoolList(prefabs);
-        SpawnInSurrondingArea(Vector2.zero);
         this.PlaneSpawnManager.SpawnInSurrowndingArea += this.HandleSpawnSrroundingArea;
         this.PlaneSpawnManager.SpawnInPosition += this.HandleSpawn;
         this.PlaneSpawnManager.DestroyPlane += this.HandleDestroy;
@@ -66,6 +65,12 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         }
 
         StartCoroutine(SpawnObsticalsAsync(pos, amount));
+    }
+
+    public void Clear()
+    {
+        this.ObjectsSpawnedPerMatrice.Clear();
+        this.ObjectsToSpawn.Clear();
     }
 
     private void HandleSpawnSrroundingArea(object sender, SpawnEventArgs args)
@@ -164,5 +169,6 @@ public class ObsticleSpawnManager : Injectable<ObsticleSpawnManager, IObsticleSp
         obj.transform.parent = parent.transform;
         SetRandomColor(obj);
     }
+
     #endregion
 }

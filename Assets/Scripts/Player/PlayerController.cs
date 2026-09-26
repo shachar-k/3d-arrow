@@ -37,6 +37,13 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
     #region Methods
 
+    public void Activate()
+    {
+        this.gameObject.SetActive(true);
+        this.GetComponent<MeshRenderer>().enabled = true;
+        this.transform.position = Vector3.zero;
+    }
+
     protected override void Start()
     {
         base.Start();
@@ -44,6 +51,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         this._defualtRotation = this.transform.rotation;
         this.MainCamera.transform.rotation = this._cameraRotationOffset;
         this._cameraDistance = this.MainCamera.transform.position - this.transform.position;
+        this.gameObject.SetActive(false);
     }
 
     void FixedUpdate()
@@ -94,6 +102,11 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
     void OnTriggerEnter(Collider other)
     {
+        if (TimeSinceRamp < 0.1)
+        {
+            return;
+        }
+
         if (other.tag == Consts.PlaneTag)
         {
             this.GameManager.SpawnPlaneByCollison(other);
@@ -101,8 +114,10 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         else if (other.tag == Consts.ObsticalTag)
         {
             this.GetComponent<MeshRenderer>().enabled = false;
+            this.TimeSinceRamp = NO_VALUE;
+            this.RampCount =1;
+            this.GameManager.SetStatus(eGameStatus.GameOver);
             StartCoroutine(this.PlayParticalsAsync());
-            this.GameManager.GameOver();
         }
     }
 
@@ -114,6 +129,8 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         yield return new WaitForSeconds(this._particleAnimationTime);
         this.ParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         this.ParticleSystem.gameObject.SetActive(false);
+        this.GameManager.GameOverScreen();
+        yield return null;
         this.gameObject.SetActive(false);
     }
 

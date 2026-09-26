@@ -31,6 +31,11 @@ public class ObjectMatrice<T> where T : class
         }
     }
 
+    public void Clear()
+    {
+        this.matrice.Clear();
+    }
+
     private T GetObject(int x, int y)
     {
         if (!matrice.ContainsKey(x) || !matrice[x].ContainsKey(y))
@@ -79,6 +84,12 @@ public class ObjectMatrice<T> where T : class
 
     private void UpdateBounds()
     {
+        if(this.matrice.Count <= 0)
+        {
+            this.MinPoint = this.MaxPoint = Vector2.zero;
+            return;
+        }
+
         int maxX = this.matrice.Keys.Max();
         int minX = this.matrice.Keys.Min();
         int maxY = this.matrice.Values.SelectMany(v => v.Keys).Max();

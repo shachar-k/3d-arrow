@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -31,36 +32,21 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
 
     private ObjectMatrice<GameObject> PlaneMatrice { get; set; } = new ObjectMatrice<GameObject>();
 
-    private GameObjectPoolList ObjectsToSpawn {get;set;}
+    private GameObjectPoolList ObjectsToSpawn { get; set; }
 
     private float TimeSinceLastSpawn { get; set; } = 0f;
 
     #endregion
 
     #region Methods
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    protected override void Start()
-    {
-        base.Start();
-        this.ObjectsToSpawn = new GameObjectPoolList(new System.Collections.Generic.List<ObjectParameters>()
-        {
-            new ObjectParameters
-            {
-                Prefab = this.plane,
-                Defualt = MAX_PLANES,
-                Max = MAX_PLANES,
-                Name = Consts.PlaneTag
-            }
-        });
-    }
 
 
-    public void SpawnPlanes()
+    public void SpawnPlanes(bool spawnObsticles = false)
     {
         this.TimeSinceLastSpawn = Time.time;
-        this.SpawnInPosition?.Invoke(this, new SpawnEventArgs(Vector2.zero));
-        this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
-        
+
+      
+
         for (int x = -1; x < MAX_PLANES - 1; x++)
         {
             for (int y = 0; y > -MAX_PLANES; y--)
@@ -70,6 +56,12 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
                     this.AddPlane(x, y);
                 }
             }
+        }
+        
+        if (spawnObsticles)
+        {
+            this.SpawnInPosition?.Invoke(this, new SpawnEventArgs(Vector2.zero));
+            this.SpawnInSurrowndingArea?.Invoke(this, new SpawnEventArgs(Vector2.zero));
         }
     }
 
@@ -91,6 +83,42 @@ public class PlaneSpawnManager : Injectable<PlaneSpawnManager, IPlaneSpawnManage
     public Bounds GetPlaneBounds(Vector2 pos)
     {
         return this.GetBounds(this.PlaneMatrice[(int)pos.x, (int)pos.y]) ?? new Bounds();
+    }
+
+
+    public void Clear()
+    {
+        Vector2 maxPoint = this.PlaneMatrice.MaxPoint;
+        Vector2 minPoint = this.PlaneMatrice.MinPoint;
+        
+        for (int x = (int)Math.Round(minPoint.x); x<= (int)Math.Round(maxPoint.x); x++)
+        {
+            for(int  y=(int)Math.Round(minPoint.y); y<= (int)Math.Round(maxPoint.y);y++)
+            {
+                this.DeletePlane(x, y);
+                this.DestroyPlane.Invoke(this, new SpawnEventArgs(new Vector2(x, y)));
+ 
+            }
+        }
+
+        this.PlaneMatrice.Clear();
+       // this.ObjectsToSpawn.Clear();
+    }
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    protected override void Start()
+    {
+        base.Start();
+        this.ObjectsToSpawn = new GameObjectPoolList(new System.Collections.Generic.List<ObjectParameters>()
+        {
+            new ObjectParameters
+            {
+                Prefab = this.plane,
+                Defualt = MAX_PLANES,
+                Max = MAX_PLANES,
+                Name = Consts.PlaneTag
+            }
+        });
     }
 
     private void CalcAdd(Vector2 posToAdd)

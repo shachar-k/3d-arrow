@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
@@ -8,6 +9,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     [SerializeField]
     private GameSettings _gameSettings;
 
+    private float _timeSinceGameStarted;
+
     #endregion
 
     #region Properties
@@ -16,7 +19,15 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private eGameStatus Status { get; set; }
 
+    private int Score { get; set; }
+
     private IPlaneSpawnManager PlaneSpawnManager => this.Container.Resolve<IPlaneSpawnManager>();
+
+    private IObsticleSpawnManager ObsticleSpawnManager => this.Container.Resolve<IObsticleSpawnManager>();
+
+    private IUIManager UIManager => this.Container.Resolve<IUIManager>() ?? this.GetComponentInChildren<UIManager>();
+
+    private Camera MainCamera => Camera.main;
 
     #endregion
 
@@ -32,27 +43,54 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.PlaneSpawnManager.SpawnPlaneByCollison(other);
     }
 
-    public void GameOver()
+    public void SetStatus(eGameStatus status)
     {
-        this.Status = eGameStatus.GameOver;
+        this.Status = status;
+    }
+
+    public void GameOverScreen()
+    {
+        int prevHighScore = PlayerPrefs.GetInt(Consts.HighScorePropName);
+        if(this.Score >= prevHighScore)
+        {
+            PlayerPrefs.SetInt(Consts.HighScorePropName,this.Score);
+        }
+
+        this.StartCoroutine(this.GameOverScreenAsync());
+    }
+
+    public void InitGame()
+    {
+        this.Status = eGameStatus.Running;
+        this.PlaneSpawnManager.SpawnPlanes(true);
+        this.Container.Resolve<IPlayerContoller>().Activate();
+        this._timeSinceGameStarted = Time.time;
     }
 
     protected override void Start()
     {
         base.Start();
         this.Container.RegisterScriptable(this._gameSettings);
-        this.InitGame();
+        this.Status = eGameStatus.Menu;
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
+        if (!this.IsGameRunning())
+        {
+            return;
+        }
 
+        this.Score =(int)((Time.time - this._timeSinceGameStarted) * 1000);
+        this.UIManager.UpdateScore(this.Score);
     }
 
-    private void InitGame()
+    private System.Collections.IEnumerator GameOverScreenAsync()
     {
-        this.Status = eGameStatus.Running;
+        yield return this.UIManager.DisplayGameOverScreen();
+        this.PlaneSpawnManager.Clear();
+        this.ObsticleSpawnManager.Clear();
+        this.MainCamera.transform.position = Vector2.zero;
         this.PlaneSpawnManager.SpawnPlanes();
     }
 
