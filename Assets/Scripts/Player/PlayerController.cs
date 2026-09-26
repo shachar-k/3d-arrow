@@ -114,6 +114,8 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         else if (other.tag == Consts.ObsticalTag)
         {
             this.GetComponent<MeshRenderer>().enabled = false;
+            this.TimeSinceRamp = NO_VALUE;
+            this.RampCount =1;
             this.GameManager.SetStatus(eGameStatus.GameOver);
             StartCoroutine(this.PlayParticalsAsync());
         }

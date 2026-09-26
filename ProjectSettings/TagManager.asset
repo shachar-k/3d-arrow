@@ -9,6 +9,7 @@ TagManager:
   - ObsticalStorage
   - GameOverText
   - ScoreText
+  - HighScoreText
   layers:
   - Default
   - TransparentFX
