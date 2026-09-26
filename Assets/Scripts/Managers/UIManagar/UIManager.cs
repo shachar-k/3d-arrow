@@ -18,6 +18,8 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
     #region Properties
     private TextMeshProUGUI GameOverText => this._gameOverTextPrefab.GetComponent<TextMeshProUGUI>();
 
+    private TextMeshProUGUI ScoreText { get; set; }
+
     private IGameManager GameManager => this.Container.Resolve<IGameManager>();
 
     private IPlaneSpawnManager PlaneSpawnManager => this.Container.Resolve<IPlaneSpawnManager>();
@@ -28,6 +30,7 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
 
     public System.Collections.IEnumerator DisplayGameOverScreen()
     {
+        this.ScoreText.gameObject.SetActive(false);
         this.GameOverText.gameObject.SetActive(true);
         this.GameOverText.text = "Game Over";
         yield return new WaitForSeconds(SECONDS_GAME_OVER_TEXT_DISPLAYED);
@@ -36,14 +39,21 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
         this.DisplayMenu();
     }
 
+    public void UpdateScore(int score)
+    {
+        this.ScoreText.text = $"Score : {score}";
+    }
+
     public void DisplayMenu()
     {
         this.SetMenuVisibility(true);
+        this.ScoreText.gameObject.SetActive(false);
     }
 
     public void OnStartClick()
     {
         this.SetMenuVisibility(false);
+        this.ScoreText.gameObject.SetActive(true);
         this.GameManager.InitGame();
     }
 
@@ -51,6 +61,7 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
     protected override void Start()
     {
         base.Start();
+        this.ScoreText = GameObject.FindWithTag(Consts.ScoreTextTag).GetComponent<TextMeshProUGUI>();
         this.GameOverText.gameObject.SetActive(false);
         this.DisplayMenu();
         this.PlaneSpawnManager.SpawnPlanes();
@@ -58,7 +69,7 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
 
     private void SetMenuVisibility(bool visible)
     {
-        foreach(var obj in this._menuStuff)
+        foreach (var obj in this._menuStuff)
         {
             obj.SetActive(visible);
         }

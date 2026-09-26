@@ -7,5 +7,7 @@ public interface IUIManager
 
     public void DisplayMenu();
 
+    public void UpdateScore(int score);
+
     #endregion
 }

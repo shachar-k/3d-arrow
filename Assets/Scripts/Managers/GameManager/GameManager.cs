@@ -9,6 +9,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     [SerializeField]
     private GameSettings _gameSettings;
 
+    private float _timeSinceGameStarted;
+
     #endregion
 
     #region Properties
@@ -16,6 +18,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     public GameSettings GameSettings => this._gameSettings;
 
     private eGameStatus Status { get; set; }
+
+    private int Score { get; set; }
 
     private IPlaneSpawnManager PlaneSpawnManager => this.Container.Resolve<IPlaneSpawnManager>();
 
@@ -41,7 +45,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     public void SetStatus(eGameStatus status)
     {
-        this.Status =status;
+        this.Status = status;
     }
 
     public void GameOverScreen()
@@ -54,6 +58,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.Status = eGameStatus.Running;
         this.PlaneSpawnManager.SpawnPlanes(true);
         this.Container.Resolve<IPlayerContoller>().Activate();
+        this._timeSinceGameStarted = Time.time;
     }
 
     protected override void Start()
@@ -61,6 +66,17 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         base.Start();
         this.Container.RegisterScriptable(this._gameSettings);
         this.Status = eGameStatus.Menu;
+    }
+
+    void FixedUpdate()
+    {
+        if (!this.IsGameRunning())
+        {
+            return;
+        }
+
+        this.Score =(int)((Time.time - this._timeSinceGameStarted) * 1000);
+        this.UIManager.UpdateScore(this.Score);
     }
 
     private System.Collections.IEnumerator GameOverScreenAsync()
