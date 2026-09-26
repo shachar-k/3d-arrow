@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
@@ -20,6 +21,8 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
 
     private TextMeshProUGUI ScoreText { get; set; }
 
+    private TextMeshProUGUI HighScoreText { get; set; }
+
     private IGameManager GameManager => this.Container.Resolve<IGameManager>();
 
     private IPlaneSpawnManager PlaneSpawnManager => this.Container.Resolve<IPlaneSpawnManager>();
@@ -32,7 +35,8 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
     {
         this.ScoreText.gameObject.SetActive(false);
         this.GameOverText.gameObject.SetActive(true);
-        this.GameOverText.text = "Game Over";
+        this.HighScoreText.gameObject.SetActive(true);
+        this.HighScoreText.text = $"High Score: {PlayerPrefs.GetInt(Consts.HighScorePropName)}";
         yield return new WaitForSeconds(SECONDS_GAME_OVER_TEXT_DISPLAYED);
         this.GameOverText.gameObject.SetActive(false);
         this.GameManager.SetStatus(eGameStatus.Menu);
@@ -48,6 +52,7 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
     {
         this.SetMenuVisibility(true);
         this.ScoreText.gameObject.SetActive(false);
+        this.HighScoreText.gameObject.SetActive(false);
     }
 
     public void OnStartClick()
@@ -62,7 +67,9 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
     {
         base.Start();
         this.ScoreText = GameObject.FindWithTag(Consts.ScoreTextTag).GetComponent<TextMeshProUGUI>();
+        this.HighScoreText = GameObject.FindWithTag(Consts.HighScoreTextTag).GetComponent<TextMeshProUGUI>();
         this.GameOverText.gameObject.SetActive(false);
+        this.HighScoreText.gameObject.SetActive(false);
         this.DisplayMenu();
         this.PlaneSpawnManager.SpawnPlanes();
     }

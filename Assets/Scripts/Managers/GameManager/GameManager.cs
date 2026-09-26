@@ -50,6 +50,12 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     public void GameOverScreen()
     {
+        int prevHighScore = PlayerPrefs.GetInt(Consts.HighScorePropName);
+        if(this.Score >= prevHighScore)
+        {
+            PlayerPrefs.SetInt(Consts.HighScorePropName,this.Score);
+        }
+
         this.StartCoroutine(this.GameOverScreenAsync());
     }
 

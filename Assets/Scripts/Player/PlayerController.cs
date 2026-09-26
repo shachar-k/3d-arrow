@@ -41,6 +41,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
     {
         this.gameObject.SetActive(true);
         this.GetComponent<MeshRenderer>().enabled = true;
+        this.transform.position = Vector3.zero;
     }
 
     protected override void Start()
