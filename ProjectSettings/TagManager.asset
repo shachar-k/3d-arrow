@@ -10,6 +10,7 @@ TagManager:
   - GameOverText
   - ScoreText
   - HighScoreText
+  - PauseMenu
   layers:
   - Default
   - TransparentFX
