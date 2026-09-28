@@ -23,6 +23,8 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
 
     private TextMeshProUGUI HighScoreText { get; set; }
 
+    private GameObject PauseMenu { get; set; }
+
     private IGameManager GameManager => this.Container.Resolve<IGameManager>();
 
     private IPlaneSpawnManager PlaneSpawnManager => this.Container.Resolve<IPlaneSpawnManager>();
@@ -41,6 +43,11 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
         this.GameOverText.gameObject.SetActive(false);
         this.GameManager.SetStatus(eGameStatus.Menu);
         this.DisplayMenu();
+    }
+
+    public void SetPauseMenuVisibility(bool visibility)
+    {
+        this.PauseMenu.SetActive(visibility);
     }
 
     public void UpdateScore(int score)
@@ -68,6 +75,8 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
         base.Start();
         this.ScoreText = GameObject.FindWithTag(Consts.ScoreTextTag).GetComponent<TextMeshProUGUI>();
         this.HighScoreText = GameObject.FindWithTag(Consts.HighScoreTextTag).GetComponent<TextMeshProUGUI>();
+        this.PauseMenu = GameObject.FindWithTag(Consts.PauseMenuTag);
+        this.PauseMenu.SetActive(false);
         this.GameOverText.gameObject.SetActive(false);
         this.HighScoreText.gameObject.SetActive(false);
         this.DisplayMenu();

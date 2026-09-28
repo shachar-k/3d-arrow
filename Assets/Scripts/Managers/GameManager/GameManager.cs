@@ -27,6 +27,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private IUIManager UIManager => this.Container.Resolve<IUIManager>() ?? this.GetComponentInChildren<UIManager>();
 
+    private IInputManager InputManager => this.Container.Resolve<IInputManager>();
+
     private Camera MainCamera => Camera.main;
 
     #endregion
@@ -51,9 +53,9 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     public void GameOverScreen()
     {
         int prevHighScore = PlayerPrefs.GetInt(Consts.HighScorePropName);
-        if(this.Score >= prevHighScore)
+        if (this.Score >= prevHighScore)
         {
-            PlayerPrefs.SetInt(Consts.HighScorePropName,this.Score);
+            PlayerPrefs.SetInt(Consts.HighScorePropName, this.Score);
         }
 
         this.StartCoroutine(this.GameOverScreenAsync());
@@ -76,12 +78,26 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     void FixedUpdate()
     {
+        bool pauseInput = this.InputManager.GetInputValue<bool>(eInput.PauseInput);
+
         if (!this.IsGameRunning())
         {
+            if (this.Status == eGameStatus.Pause && pauseInput)
+            {
+                this.UIManager.SetPauseMenuVisibility(false);
+                this.Status = eGameStatus.Running;
+            }
+
             return;
         }
 
-        this.Score =(int)((Time.time - this._timeSinceGameStarted) * 1000);
+        if (pauseInput)
+        {
+            this.Status = eGameStatus.Pause;
+            this.UIManager.SetPauseMenuVisibility(true);
+        }
+        
+        this.Score = (int)((Time.time - this._timeSinceGameStarted) * 1000);
         this.UIManager.UpdateScore(this.Score);
     }
 

@@ -68,6 +68,13 @@ public class InputManager : Singleton<InputManager>, IInputManager, IInitializbl
         {
             (input.Value as InputTypeValue<float>).Value = GetNumberValue<float>(input.Value);
         }
+
+        var boolValueInput = this._inputValues.Where(x => x.Value.Type == typeof(bool)).ToList();
+
+        foreach (var input in boolValueInput)
+        {
+            (input.Value as InputTypeValue<bool>).Value = input.Value.Action.triggered;
+        }
     }
 
     private static T GetNumberValue<T>(InputTypeValue input) where T : struct
@@ -83,6 +90,10 @@ public class InputManager : Singleton<InputManager>, IInputManager, IInitializbl
         this._inputValues[eInput.playerMoveInput] = new InputTypeValue<float>()
         {
             Action = player.FindAction(Consts.MoveAction, throwIfNotFound: true)
+        };
+
+        this._inputValues[eInput.PauseInput] = new InputTypeValue<bool>(){
+            Action = player.FindAction(Consts.PauseAction, throwIfNotFound: true)
         };
     }
 
