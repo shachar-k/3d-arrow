@@ -20,6 +20,7 @@ MonoBehaviour:
   RampSpeed: 1.5
   MaxRamp: 6
   RampFixedMinutes: 0.3
-  ObstaclePoolPlaneMinSize: 0
-  ObstaclePoolPlaneMaxSize: 11
+  ObstaclePoolPlaneMinSize: 7
+  ObstaclePoolPlaneMaxSize: 20
+  MaxSizeOfObject: 4
   CooldownBetweenSpawns: 0.1
