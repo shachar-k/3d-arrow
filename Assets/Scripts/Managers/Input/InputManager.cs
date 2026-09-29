@@ -49,6 +49,11 @@ public class InputManager : Singleton<InputManager>, IInputManager, IInitializbl
         }
     }
 
+    public InputAction GetAction(eInput input)
+    {
+        return this._inputValues[input].Action;
+    }
+
     public void EnableMap(eInputMap inputMap)
     {
         this._inputMaps[inputMap].Enable();
@@ -67,13 +72,6 @@ public class InputManager : Singleton<InputManager>, IInputManager, IInitializbl
         foreach (var input in floatValueInput)
         {
             (input.Value as InputTypeValue<float>).Value = GetNumberValue<float>(input.Value);
-        }
-
-        var boolValueInput = this._inputValues.Where(x => x.Value.Type == typeof(bool)).ToList();
-
-        foreach (var input in boolValueInput)
-        {
-            (input.Value as InputTypeValue<bool>).Value = input.Value.Action.triggered;
         }
     }
 

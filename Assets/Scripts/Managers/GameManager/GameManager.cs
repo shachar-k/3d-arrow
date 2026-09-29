@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 {
@@ -29,6 +31,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private IInputManager InputManager => this.Container.Resolve<IInputManager>();
 
+    private InputAction PauseAction=> this.InputManager.GetAction(eInput.PauseInput);
+
     private Camera MainCamera => Camera.main;
 
     #endregion
@@ -53,6 +57,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     public void GameOverScreen()
     {
         int prevHighScore = PlayerPrefs.GetInt(Consts.HighScorePropName);
+        this.PauseAction.performed -= this.OnPauseAction;
         if (this.Score >= prevHighScore)
         {
             PlayerPrefs.SetInt(Consts.HighScorePropName, this.Score);
@@ -66,6 +71,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.Status = eGameStatus.Running;
         this.PlaneSpawnManager.SpawnPlanes(true);
         this.Container.Resolve<IPlayerContoller>().Activate();
+        this.PauseAction.performed += this.OnPauseAction;
         this._timeSinceGameStarted = Time.time;
     }
 
@@ -78,27 +84,26 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     void FixedUpdate()
     {
-        bool pauseInput = this.InputManager.GetInputValue<bool>(eInput.PauseInput);
-
         if (!this.IsGameRunning())
         {
-            if (this.Status == eGameStatus.Pause && pauseInput)
-            {
-                this.UIManager.SetPauseMenuVisibility(false);
-                this.Status = eGameStatus.Running;
-            }
-
             return;
-        }
-
-        if (pauseInput)
-        {
-            this.Status = eGameStatus.Pause;
-            this.UIManager.SetPauseMenuVisibility(true);
         }
         
         this.Score = (int)((Time.time - this._timeSinceGameStarted) * 1000);
         this.UIManager.UpdateScore(this.Score);
+    }
+
+    private void OnPauseAction(CallbackContext context)
+    {
+        if (this.IsGameRunning())
+        {
+            this.Status = eGameStatus.Pause;
+            this.UIManager.SetPauseMenuVisibility(true);
+        }else if(this.Status == eGameStatus.Pause)
+        {
+             this.Status = eGameStatus.Running;
+            this.UIManager.SetPauseMenuVisibility(false);
+        }
     }
 
     private System.Collections.IEnumerator GameOverScreenAsync()
