@@ -29,6 +29,8 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
 
     private ParticleSystem ParticleSystem { get; set; }
 
+    private AudioSource AudioSource => this.GetComponent<AudioSource>();
+
     private float TimeSinceRamp { get; set; } = NO_VALUE;
 
     private int RampCount { get; set; } = 1;
@@ -113,9 +115,10 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         }
         else if (other.tag == Consts.ObsticalTag)
         {
+            this.AudioSource.PlayOneShot(this.AudioSource.clip);
             this.GetComponent<MeshRenderer>().enabled = false;
             this.TimeSinceRamp = NO_VALUE;
-            this.RampCount =1;
+            this.RampCount = 1;
             this.GameManager.SetStatus(eGameStatus.GameOver);
             StartCoroutine(this.PlayParticalsAsync());
         }
@@ -130,7 +133,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         this.ParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         this.ParticleSystem.gameObject.SetActive(false);
         this.GameManager.GameOverScreen();
-        yield return null;
+        yield return new WaitUntil(() =>!this.AudioSource.isPlaying);
         this.gameObject.SetActive(false);
     }
 
