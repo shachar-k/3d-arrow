@@ -19,7 +19,7 @@ MonoBehaviour:
   BaseSpeed: 4
   RampSpeed: 1.5
   MaxRamp: 6
-  RampFixedMinutes: 0.3
+  RampFixedMinutes: 1
   ObstaclePoolPlaneMinSize: 7
   ObstaclePoolPlaneMaxSize: 20
   MaxSizeOfObject: 4

@@ -69,6 +69,17 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
         this.GameManager.InitGame();
     }
 
+
+    public void QuitGame()
+    {
+    #if UNITY_STANDALONE
+        Application.Quit();
+    #endif
+    #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+    #endif
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     protected override void Start()
     {
