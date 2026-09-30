@@ -33,6 +33,8 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private InputAction PauseAction=> this.InputManager.GetAction(eInput.PauseInput);
 
+    private AudioSource AudioSource => this.GetComponent<AudioSource>();
+
     private Camera MainCamera => Camera.main;
 
     #endregion
@@ -56,6 +58,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     public void GameOverScreen()
     {
+        this.AudioSource.enabled =false;
         int prevHighScore = PlayerPrefs.GetInt(Consts.HighScorePropName);
         this.PauseAction.performed -= this.OnPauseAction;
         if (this.Score >= prevHighScore)
@@ -73,6 +76,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.Container.Resolve<IPlayerContoller>().Activate();
         this.PauseAction.performed += this.OnPauseAction;
         this._timeSinceGameStarted = Time.time;
+        this.AudioSource.enabled =true;
     }
 
     protected override void Start()
@@ -80,6 +84,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         base.Start();
         this.Container.RegisterScriptable(this._gameSettings);
         this.Status = eGameStatus.Menu;
+        this.AudioSource.enabled =false;
     }
 
     void FixedUpdate()
