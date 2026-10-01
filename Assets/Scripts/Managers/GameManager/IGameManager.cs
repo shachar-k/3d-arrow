@@ -3,6 +3,9 @@ using UnityEngine;
 public interface IGameManager
 {
     #region Methods
+
+    public void StopMusic();
+
     public bool IsGameRunning();
 
     public void SpawnPlaneByCollison(Collider other);

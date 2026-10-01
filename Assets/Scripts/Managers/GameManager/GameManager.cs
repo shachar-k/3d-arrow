@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using static UnityEngine.InputSystem.InputAction;
 
 public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 {
@@ -27,11 +29,22 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
 
     private IUIManager UIManager => this.Container.Resolve<IUIManager>() ?? this.GetComponentInChildren<UIManager>();
 
+    private IInputManager InputManager => this.Container.Resolve<IInputManager>();
+
+    private InputAction PauseAction => this.InputManager.GetAction(eInput.PauseInput);
+
+    private AudioSource AudioSource => this.GetComponent<AudioSource>();
+
     private Camera MainCamera => Camera.main;
 
     #endregion
 
     #region Methods
+
+    public void StopMusic()
+    {
+        this.AudioSource.enabled = false;
+    }
 
     public bool IsGameRunning()
     {
@@ -51,9 +64,10 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
     public void GameOverScreen()
     {
         int prevHighScore = PlayerPrefs.GetInt(Consts.HighScorePropName);
-        if(this.Score >= prevHighScore)
+        this.PauseAction.performed -= this.OnPauseAction;
+        if (this.Score >= prevHighScore)
         {
-            PlayerPrefs.SetInt(Consts.HighScorePropName,this.Score);
+            PlayerPrefs.SetInt(Consts.HighScorePropName, this.Score);
         }
 
         this.StartCoroutine(this.GameOverScreenAsync());
@@ -64,7 +78,9 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         this.Status = eGameStatus.Running;
         this.PlaneSpawnManager.SpawnPlanes(true);
         this.Container.Resolve<IPlayerContoller>().Activate();
+        this.PauseAction.performed += this.OnPauseAction;
         this._timeSinceGameStarted = Time.time;
+        this.AudioSource.enabled = true;
     }
 
     protected override void Start()
@@ -72,6 +88,7 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
         base.Start();
         this.Container.RegisterScriptable(this._gameSettings);
         this.Status = eGameStatus.Menu;
+        this.AudioSource.enabled = false;
     }
 
     void FixedUpdate()
@@ -81,8 +98,22 @@ public class GameManager : Injectable<GameManager, IGameManager>, IGameManager
             return;
         }
 
-        this.Score =(int)((Time.time - this._timeSinceGameStarted) * 1000);
+        this.Score = (int)((Time.time - this._timeSinceGameStarted) * 1000);
         this.UIManager.UpdateScore(this.Score);
+    }
+
+    private void OnPauseAction(CallbackContext context)
+    {
+        if (this.IsGameRunning())
+        {
+            this.Status = eGameStatus.Pause;
+            this.UIManager.SetPauseMenuVisibility(true);
+        }
+        else if (this.Status == eGameStatus.Pause)
+        {
+            this.Status = eGameStatus.Running;
+            this.UIManager.SetPauseMenuVisibility(false);
+        }
     }
 
     private System.Collections.IEnumerator GameOverScreenAsync()

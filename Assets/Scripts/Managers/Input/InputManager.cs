@@ -49,6 +49,11 @@ public class InputManager : Singleton<InputManager>, IInputManager, IInitializbl
         }
     }
 
+    public InputAction GetAction(eInput input)
+    {
+        return this._inputValues[input].Action;
+    }
+
     public void EnableMap(eInputMap inputMap)
     {
         this._inputMaps[inputMap].Enable();
@@ -83,6 +88,10 @@ public class InputManager : Singleton<InputManager>, IInputManager, IInitializbl
         this._inputValues[eInput.playerMoveInput] = new InputTypeValue<float>()
         {
             Action = player.FindAction(Consts.MoveAction, throwIfNotFound: true)
+        };
+
+        this._inputValues[eInput.PauseInput] = new InputTypeValue<bool>(){
+            Action = player.FindAction(Consts.PauseAction, throwIfNotFound: true)
         };
     }
 
