@@ -25,6 +25,8 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
 
     private GameObject PauseMenu { get; set; }
 
+    private GameObject ControlsMenu { get; set; }
+
     private IGameManager GameManager => this.Container.Resolve<IGameManager>();
 
     private IPlaneSpawnManager PlaneSpawnManager => this.Container.Resolve<IPlaneSpawnManager>();
@@ -69,6 +71,17 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
         this.GameManager.InitGame();
     }
 
+    public void OnControlsClick()
+    {
+        this.SetMenuVisibility(false);
+        this.ControlsMenu.SetActive(true);
+    }
+
+    public void OnBackClick()
+    {
+        this.ControlsMenu.SetActive(false);
+        this.DisplayMenu();
+    }
 
     public void QuitGame()
     {
@@ -87,7 +100,9 @@ public class UIManager : Injectable<UIManager, IUIManager>, IUIManager
         this.ScoreText = GameObject.FindWithTag(Consts.ScoreTextTag).GetComponent<TextMeshProUGUI>();
         this.HighScoreText = GameObject.FindWithTag(Consts.HighScoreTextTag).GetComponent<TextMeshProUGUI>();
         this.PauseMenu = GameObject.FindWithTag(Consts.PauseMenuTag);
+        this.ControlsMenu = GameObject.FindWithTag(Consts.ControlsMenuTag);
         this.PauseMenu.SetActive(false);
+        this.ControlsMenu.SetActive(false);
         this.GameOverText.gameObject.SetActive(false);
         this.HighScoreText.gameObject.SetActive(false);
         this.DisplayMenu();

@@ -10,5 +10,5 @@ public static class Consts
     public const string ScoreTextTag ="ScoreText";
     public const string HighScoreTextTag ="HighScoreText";
     public const string PauseMenuTag = "PauseMenu";
-
+    public const string ControlsMenuTag = "ControlsMenu";
 }

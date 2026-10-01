@@ -16,7 +16,7 @@ MonoBehaviour:
   TurnAngle: 30
   TurnRate: 0.25
   PlaneStartLocation: {x: 0, y: -0.27, z: 0}
-  BaseSpeed: 4
+  BaseSpeed: 5
   RampSpeed: 1.5
   MaxRamp: 6
   RampFixedMinutes: 1
