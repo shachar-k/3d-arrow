@@ -115,6 +115,7 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         }
         else if (other.tag == Consts.ObsticalTag)
         {
+            this.GameManager.StopMusic();
             this.AudioSource.PlayOneShot(this.AudioSource.clip);
             this.GetComponent<MeshRenderer>().enabled = false;
             this.TimeSinceRamp = NO_VALUE;
@@ -132,8 +133,8 @@ public class PlayerController : Injectable<PlayerController, IPlayerContoller>, 
         yield return new WaitForSeconds(this._particleAnimationTime);
         this.ParticleSystem.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         this.ParticleSystem.gameObject.SetActive(false);
+        yield return new WaitForSeconds(0.7f);
         this.GameManager.GameOverScreen();
-        yield return new WaitUntil(() =>!this.AudioSource.isPlaying);
         this.gameObject.SetActive(false);
     }
 
